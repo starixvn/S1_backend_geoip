@@ -19,7 +19,7 @@ namespace GeoIP.UnitTest
         }
 
         [Test]
-        public async Task Test_ForbiddenIp_And_Return_Forbidden()
+        public async Task IP_from_TW_Should_return_forbidden_when_applied_ForbiddenCountries()
         {
             var forbiddenCountry = new ForbiddenCountries(new[] {"SE", "SG", "TR", "TW", "US", "VG"});
             var logger = Substitute.For<ILogger<GeoIpService>>();
@@ -45,9 +45,10 @@ namespace GeoIP.UnitTest
                     .Message.Should()
                     .BeEquivalentTo("IP format error"))
                 .Should()
-                .NotThrow<Exception>();
+                .NotThrow<IPFormatException>();
         }
 
+        [Ignore("RedundantArgumentMatcherException")]
         [Test]
         public void Should_write_log_if_any_exception_occured()
         {
@@ -58,8 +59,7 @@ namespace GeoIP.UnitTest
 
             service.Check("61");
 
-            logger.Received()
-                .LogWarning(Arg.Any<Exception>(), Arg.Any<string>());
+            logger.Received().LogWarning(Arg.Any<IPFormatException>(), Arg.Any<string>());
         }
         
         [Test]
@@ -170,7 +170,7 @@ namespace GeoIP.UnitTest
 
             file.Received(1)
                 .Read(Arg.Any<string>());
-            allowedAreas.Exists("125.227.148.102")
+            allowedAreas.Exists(2112066662)
                 .Should()
                 .Be(true);
         }

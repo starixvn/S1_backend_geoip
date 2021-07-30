@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using GeoIP.DAL;
 using GeoIP.Models;
@@ -9,7 +10,7 @@ namespace GeoIP
     public class GeoIpService
     {
         private readonly IFile _file;
-        private ILogger<GeoIpService> _logger;
+        private readonly ILogger<GeoIpService> _logger;
         private readonly IIpCountryDataLayers _ipCountry;
         private ForbiddenCountries _forbiddenCountries = new ForbiddenCountries(new[] {""});
         private AllowedAreas _whiteList = new AllowedAreas(new List<IPRange>());
@@ -20,20 +21,29 @@ namespace GeoIP
             _logger = logger;
             _ipCountry = ipCountry;
         }
-        public async Task<Country> Check(string ipAddr)
+        public async Task<Country> Check(string ipAddress)
         {
-            var ip = _whiteList.GetIpToLong(ipAddr);
-            var ipCountry = await _ipCountry.GetIpCountry(ip);
-            if (ipCountry != null)
+            var country = new Country();
+            try
             {
-                return new Country()
+                var uip = _whiteList.GetIpToLong(ipAddress);
+                var ipCountry = await _ipCountry.GetIpCountry(uip);
+                if (ipCountry != null)
                 {
-                    Code = ipCountry.Code,
-                    Forbidden = !_whiteList.Exists(ipAddr) && _forbiddenCountries.Exists(ipCountry.Code),
-                };
+                    return new Country()
+                    {
+                        Code = ipCountry.Code,
+                        Forbidden = !_whiteList.Exists(uip) && _forbiddenCountries.Exists(ipCountry.Code),
+                    };
+                }
             }
-
-            return new Country();
+            catch (IPFormatException e)
+            {
+                country.Message = e.Message;
+                _logger.LogWarning(e, $"The IP: {ipAddress} occured {e.Message}.");
+            }
+            
+            return country;
         }
         
         public void ApplyForbidden(ForbiddenCountries forbiddenCountries)

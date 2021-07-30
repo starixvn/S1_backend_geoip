@@ -14,18 +14,35 @@ namespace GeoIP.Models
             _ipRanges = ipRanges;
         }
 
-        public bool Exists(string ip)
+        public bool Exists(uint uintIp)
         {
-            var uintIP = GetIpToLong(ip);
-            var range = _ipRanges.SingleOrDefault(o => uintIP >= o.From && uintIP <= o.To);
+            var range = _ipRanges.SingleOrDefault(o => uintIp >= o.From && uintIp <= o.To);
             return range != null;
         }
 
-        public uint GetIpToLong(string ipAddr)
+        public uint GetIpToLong(string ipAddress)
         {
-            byte[] b = IPAddress.Parse(ipAddr).GetAddressBytes();
-            Array.Reverse(b);
-            return BitConverter.ToUInt32(b, 0);
+            if (ipAddress.IndexOf(".", StringComparison.Ordinal) > 0)
+            {
+                try
+                {
+                    var b = IPAddress.Parse(ipAddress).GetAddressBytes();
+                    Array.Reverse(b);
+                    return BitConverter.ToUInt32(b, 0);
+                }
+                catch (Exception e)
+                {
+                    throw new IPFormatException("ipv4 format error");
+                }
+            }
+            else if(ipAddress.IndexOf(":", StringComparison.Ordinal) > 0)
+            {
+                throw new IPFormatException("no support ipv6");
+            }
+            else
+            {
+                throw new IPFormatException("ip format error");
+            }
         }
     }
 }
