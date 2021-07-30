@@ -15,7 +15,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\GeoIP\GeoIP.csproj" />
+      <ProjectReference Include="..\GeoIP.Core\GeoIP.Core.csproj" />
     </ItemGroup>
 
     <ItemGroup>
