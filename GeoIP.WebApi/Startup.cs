@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using GeoIP.DAL;
 using GeoIP.WebApi.Extension;
+using GeoIP.WebApi.Extension.Middlewares;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -63,7 +64,8 @@ namespace GeoIP.WebApi
             app.UseRouting();
 
             app.UseAuthorization();
-
+            app.UseRequestLogMiddleware();
+            app.UseResponseLogMiddleware();
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
         }
     }

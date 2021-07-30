@@ -15,8 +15,10 @@ namespace GeoIP.WebApi
 {
     public class Program
     {
+        private static string _env;
         public static void Main(string[] args)
         {
+            _env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production"; 
             CreateHostBuilder(args).Build().Run();
         }
 
@@ -34,19 +36,29 @@ namespace GeoIP.WebApi
                             
                             loggerConfiguration.Enrich.FromLogContext()
                                 .Enrich.WithExceptionDetails();
-                            
-                            loggerConfiguration.WriteTo.File(new JsonFormatter(),
-                                    fullLogPath,
-                                    serilogOption.MinimumLevel.Default,
-                                    serilogOption.FileSizeLimitBytes,
-                                    null,
-                                    false,
-                                    true,
-                                    null,
-                                    RollingInterval.Day,
-                                    serilogOption.RollOnFileSizeLimit,
-                                    null)
-                                .MinimumLevel.Information();
+                            switch (hostContext.HostingEnvironment.EnvironmentName)
+                            {
+                                case "Local":
+                                    loggerConfiguration
+                                        .MinimumLevel.Debug()
+                                        .WriteTo
+                                        .LiterateConsole();
+                                    break;
+                                default: 
+                                    loggerConfiguration.WriteTo.File(new JsonFormatter(),
+                                            fullLogPath,
+                                            serilogOption.MinimumLevel.Default,
+                                            serilogOption.FileSizeLimitBytes,
+                                            null,
+                                            false,
+                                            true,
+                                            null,
+                                            RollingInterval.Day,
+                                            serilogOption.RollOnFileSizeLimit,
+                                            null)
+                                        .MinimumLevel.Information();
+                                    break;
+                            }
                         })
                         .UseStartup<Startup>();
                 });
@@ -57,7 +69,7 @@ namespace GeoIP.WebApi
                 .AddEnvironmentVariables()
                 .AddJsonFile($"appsettings.json", false, true)
                 .AddJsonFile(
-                    $"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production"}.json",
+                    $"appsettings.{_env}.json",
                     false, true);
     }
 }

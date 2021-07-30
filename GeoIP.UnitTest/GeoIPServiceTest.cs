@@ -93,19 +93,18 @@ namespace GeoIP.UnitTest
             {
                 "TW",
                 "HK",
-                ""
+                "-"
             });
 
             var logger = Substitute.For<ILogger<GeoIpService>>();
             var file = Substitute.For<IFile>();
             var ipCountryDal = Substitute.For<IIpCountryDataLayers>();
-            ipCountryDal.GetIpCountry(Arg.Is(3232235777)).Returns(x => new IPCountry() {Code = ""});
+            ipCountryDal.GetIpCountry(Arg.Is(3232235777)).Returns(x => new IPCountry() {Code = "-"});
             var service = new GeoIpService(file, logger, ipCountryDal);
             service.ApplyForbidden(forbiddenCountries);
 
             var country = await service.Check(ipv6);
-            country.Code.Should()
-                .BeEmpty();
+            country.Code.Should().Be("-");
             country.Forbidden.Should()
                 .Be(true);
         }
