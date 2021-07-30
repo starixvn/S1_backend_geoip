@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GeoIP.DAL;
-using GeoIP.DataLayers;
 using GeoIP.WebApi.Extension;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;

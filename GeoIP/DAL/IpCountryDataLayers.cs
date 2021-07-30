@@ -1,13 +1,10 @@
-﻿using System.Collections.Generic;
-using System.Data;
-using System.Linq;
+﻿using System.Data;
 using System.Threading.Tasks;
 using Dapper;
-using GeoIP.DAL;
 using GeoIP.Library;
 using GeoIP.Models;
 
-namespace GeoIP.DataLayers
+namespace GeoIP.DAL
 {
     public class IpCountryDataLayers : IIpCountryDataLayers
     {

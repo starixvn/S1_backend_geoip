@@ -4,6 +4,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeoIP.WebApi", "GeoIP.WebAp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeoIP", "GeoIP\GeoIP.csproj", "{DAA1A25B-5A7E-45E9-954B-5BE314FE6B7B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeoIP.UnitTest", "GeoIP.UnitTest\GeoIP.UnitTest.csproj", "{2A176A5A-43B9-4783-A310-9AE122E02828}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +20,9 @@ Global
 		{DAA1A25B-5A7E-45E9-954B-5BE314FE6B7B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DAA1A25B-5A7E-45E9-954B-5BE314FE6B7B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DAA1A25B-5A7E-45E9-954B-5BE314FE6B7B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2A176A5A-43B9-4783-A310-9AE122E02828}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2A176A5A-43B9-4783-A310-9AE122E02828}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2A176A5A-43B9-4783-A310-9AE122E02828}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2A176A5A-43B9-4783-A310-9AE122E02828}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
