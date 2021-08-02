@@ -12,7 +12,7 @@ using Microsoft.Extensions.Primitives;
 
 namespace GeoIP.WebApi.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("GeoIp/[controller]")]
     [ApiController]
     [Produces("application/json")]
     public class CheckIpController : ControllerBase
