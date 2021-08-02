@@ -47,7 +47,7 @@ namespace GeoIP.WebApi.Controllers
             return Ok(countryModel);
         }
         
-        [HttpGet("clientip")]
+        [HttpGet("ClientIp")]
         public async Task<ActionResult<IPCountryModel>> GetAndCheckClientIP()
         {
             var ip = IPTool.GetClientIPAddress(Request);
