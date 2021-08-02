@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using GeoIP.Core;
 using GeoIP.Core.Models;
+using GeoIP.WebApi.Extension;
 using GeoIP.WebApi.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -49,7 +50,7 @@ namespace GeoIP.WebApi.Controllers
         [HttpGet("clientip")]
         public async Task<ActionResult<IPCountryModel>> GetAndCheckClientIP()
         {
-            var ip = GetClientIPAddress();
+            var ip = IPTool.GetClientIPAddress(Request);
             var country = await _service.Check(ip);
             var ipCountryModel = new IPCountryModel
             {
@@ -62,42 +63,6 @@ namespace GeoIP.WebApi.Controllers
             _logger.LogInformation($"IPAddress: [{ip}] CountryCode: [{country.Code}] Forbidden is {country.Forbidden}");
 
             return Ok(ipCountryModel);
-        }
-        private string GetClientIPAddress()
-        {
-            var remoteIp = GetHeaderValueAs<string>("X-Forwarded-For");
-            if (!string.IsNullOrEmpty(remoteIp) && remoteIp.Contains(","))
-            {
-                return remoteIp.Split(',').First().Trim();
-            }
-
-            if (string.IsNullOrEmpty(remoteIp))
-            {
-                remoteIp = GetHeaderValueAs<string>("REMOTE_ADDR");
-            }
-
-            if (string.IsNullOrEmpty(remoteIp))
-            {
-                remoteIp = GetHeaderValueAs<string>("REMOTE_HOST");
-            }
-
-            if (string.IsNullOrEmpty(remoteIp) && Request?.HttpContext?.Connection?.RemoteIpAddress != null)
-            {
-                remoteIp = Request.HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString();
-                remoteIp = remoteIp == "0.0.0.1" ? "127.0.0.1" : remoteIp;
-            }
-            return remoteIp ;
-        }
-        private T GetHeaderValueAs<T>(string headerName)
-        {
-            if (Request?.Headers?.TryGetValue(headerName, out StringValues values) ?? false)
-            {
-                string rawValues = values.ToString(); 
-
-                if (!string.IsNullOrWhiteSpace(rawValues))
-                    return (T)Convert.ChangeType(values.ToString(), typeof(T));
-            }
-            return default;
         }
     }
 }
