@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Serilog;
+using Serilog.Events;
 using Serilog.Exceptions;
 using Serilog.Formatting.Json;
 
@@ -36,6 +37,9 @@ namespace GeoIP.WebApi
                             
                             loggerConfiguration.Enrich.FromLogContext()
                                 .Enrich.WithExceptionDetails();
+                            
+                            loggerConfiguration.MinimumLevel.Override("Microsoft", LogEventLevel.Information);
+                            loggerConfiguration.MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning);
                             switch (hostContext.HostingEnvironment.EnvironmentName)
                             {
                                 case "Local":
@@ -44,7 +48,7 @@ namespace GeoIP.WebApi
                                         .WriteTo
                                         .LiterateConsole();
                                     break;
-                                default: 
+                                default:
                                     loggerConfiguration.WriteTo.File(new JsonFormatter(),
                                             fullLogPath,
                                             serilogOption.MinimumLevel.Default,
