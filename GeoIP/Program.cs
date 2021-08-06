@@ -37,9 +37,12 @@ namespace GeoIP.WebApi
                             
                             loggerConfiguration.Enrich.FromLogContext()
                                 .Enrich.WithExceptionDetails();
+
+                            foreach (var log in serilogOption.MinimumLevel.Overwrite)
+                            {
+                                loggerConfiguration.MinimumLevel.Override(log.Name, log.Level);
+                            }
                             
-                            loggerConfiguration.MinimumLevel.Override("Microsoft", LogEventLevel.Information);
-                            loggerConfiguration.MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning);
                             switch (hostContext.HostingEnvironment.EnvironmentName)
                             {
                                 case "Local":
