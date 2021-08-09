@@ -40,7 +40,7 @@ namespace GeoIP.Core
             catch (IPFormatException e)
             {
                 country.Message = e.Message;
-                _logger.LogWarning(e, $"The IP: {ipAddress} occured {e.Message}.");
+                _logger.LogError(e, $"The IP: {ipAddress} occured {e.Message}.");
             }
             
             return country;
