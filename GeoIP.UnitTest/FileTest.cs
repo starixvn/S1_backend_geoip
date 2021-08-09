@@ -24,7 +24,7 @@ namespace GeoIP.UnitTest
 
             var actual = file.Read("./Data/IPInfo_WhiteList.csv");
 
-            var expectation = new List<IPRange>(){new IPRange(){Description = "辦公室VPN", To = 2112066657, From = 2112066657}};
+            var expectation = new List<IPRange>(){new IPRange(){Description = "辦公室VPN 125.227.148.102", To = 2112066657, From = 2112066657}};
             
             actual.Should().BeEquivalentTo(expectation);
         }
@@ -41,7 +41,7 @@ namespace GeoIP.UnitTest
             var actual = file.Read("./Data/IPInfo_WhiteList_with_EmptyValue.csv");
 
             var expectation = new List<IPRange>
-                {new IPRange() {Description = "辦公室VPN", To = 2112066657, From = 2112066657}};
+                {new IPRange() {Description = "辦公室VPN 125.227.148.102", To = 2112066657, From = 2112066657}};
             
             actual.Should().BeEquivalentTo(expectation);
         }
@@ -58,7 +58,7 @@ namespace GeoIP.UnitTest
             var actual = file.Read("./Data/IPInfo_WhiteList_with_DuplicatedIPs.csv");
 
             var expectation = new List<IPRange>
-                {new IPRange() {Description = "辦公室VPN", To = 2112066657, From = 2112066657}};
+                {new IPRange() {Description = "辦公室VPN 125.227.148.102", To = 2112066657, From = 2112066657}};
             
             actual.Should().BeEquivalentTo(expectation);
         }
