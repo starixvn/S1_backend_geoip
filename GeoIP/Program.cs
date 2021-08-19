@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using GeoIP.WebApi.Models;
 using Microsoft.AspNetCore.Hosting;
@@ -42,6 +43,9 @@ namespace GeoIP.WebApi
                             {
                                 loggerConfiguration.MinimumLevel.Override(log.Name, log.Level);
                             }
+
+                            loggerConfiguration.Filter.ByExcluding(p =>
+                                p.Properties["RequestPath"].ToString().Contains("health"));
                             
                             switch (hostContext.HostingEnvironment.EnvironmentName)
                             {
