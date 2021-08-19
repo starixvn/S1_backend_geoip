@@ -1,9 +1,11 @@
+using System;
 using GeoIP.Core;
 using GeoIP.Core.DAL;
 using GeoIP.WebApi.Extension;
 using GeoIP.WebApi.Extension.Middlewares;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -61,7 +63,15 @@ namespace GeoIP.WebApi
             app.UseAuthorization();
             app.UseRequestLogMiddleware();
             app.UseResponseLogMiddleware();
-            app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapGet("/health", async context =>
+                {
+                    await context.Response.WriteAsync($"{env.EnvironmentName}-{DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss")}");
+                });
+
+                endpoints.MapControllers();
+            });
         }
     }
 }
