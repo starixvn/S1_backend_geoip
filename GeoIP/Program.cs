@@ -45,7 +45,8 @@ namespace GeoIP.WebApi
                             }
 
                             loggerConfiguration.Filter.ByExcluding(p =>
-                                p.Properties["RequestPath"].ToString().Contains("health"));
+                                p.Properties.TryGetValue("RequestPath", out var path) 
+                                && path.ToString().Contains("/health"));
                             
                             switch (hostContext.HostingEnvironment.EnvironmentName)
                             {
