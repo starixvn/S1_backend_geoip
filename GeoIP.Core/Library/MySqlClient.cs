@@ -4,6 +4,7 @@ using System.Data;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using Dapper;
+using GeoIP.Core.Models;
 using Microsoft.Extensions.Logging;
 using MySql.Data.MySqlClient;
 using Serilog.Context;
@@ -12,14 +13,16 @@ namespace GeoIP.Core.Library
 {
     public class MySqlClient : IMySqlClient
     {
+        public DataBase DataBase { get; set; }
         private readonly string _connectionString;
 
         private readonly ILogger<MySqlClient> _logger;
 
-        public MySqlClient(string connectionString, ILogger<MySqlClient> logger)
+        public MySqlClient(string connectionString, ILogger<MySqlClient> logger, DataBase dataBase)
         {
             _connectionString = connectionString;
             _logger = logger;
+            DataBase = dataBase;
         }
         
         public async Task<IEnumerable<T>> QueryAsync<T>(string name, SqlMapper.IDynamicParameters parameters)
