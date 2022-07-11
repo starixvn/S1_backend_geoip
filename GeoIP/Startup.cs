@@ -1,6 +1,7 @@
 using System;
 using GeoIP.Core;
 using GeoIP.Core.DAL;
+using GeoIP.Core.Models;
 using GeoIP.WebApi.Extension;
 using GeoIP.WebApi.Extension.Middlewares;
 using Microsoft.AspNetCore.Builder;
@@ -37,8 +38,10 @@ namespace GeoIP.WebApi
                 .AddSingleton<ILogger<GeoIpService>, Logger<GeoIpService>>()
                 .AddSingleton<GeoIpService>()
                 .AddSingleton<GeoIpSettings>()
+                .AddSingleton<BlockIP>()
                 .AddSingleton<IFile, FileLoader>()
                 .AddSingleton<IIpCountryDataLayers, IpCountryDataLayers>()
+                .AddSingleton<IMemberBlockIpDataLayers, MemberBlockIpDataLayers>()
                 .Configure<ForwardedHeadersOptions>(options =>
                 {
                     options.ForwardedHeaders = ForwardedHeaders.All;

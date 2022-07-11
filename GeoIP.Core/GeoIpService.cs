@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using GeoIP.Core.DAL;
 using GeoIP.Core.Models;
@@ -14,12 +15,15 @@ namespace GeoIP.Core
         private readonly IIpCountryDataLayers _ipCountry;
         private ForbiddenCountries _forbiddenCountries = new ForbiddenCountries(new[] {""});
         private AllowedAreas _whiteList = new AllowedAreas(new List<IPRange>());
+        private readonly BlockIP _blockIp;
 
-        public GeoIpService(IFile file, ILogger<GeoIpService> logger, IIpCountryDataLayers ipCountry)
+        public GeoIpService(IFile file, ILogger<GeoIpService> logger, BlockIP blockIp, IIpCountryDataLayers ipCountry, IMemberBlockIpDataLayers memberBlockIp)
         {
             _file = file;
             _logger = logger;
             _ipCountry = ipCountry;
+            _blockIp = blockIp;
+            _blockIp._blockList = memberBlockIp.GetBlockIp().Result.ToList();
         }
         public async Task<Country> Check(string ipAddress)
         {
@@ -33,7 +37,7 @@ namespace GeoIP.Core
                     return new Country()
                     {
                         Code = ipCountry.Code,
-                        Forbidden = !_whiteList.Exists(uip) && _forbiddenCountries.Exists(ipCountry.Code),
+                        Forbidden = _blockIp.Exists(ipAddress) || (_forbiddenCountries.Exists(ipCountry.Code) && !_whiteList.Exists(uip)),
                     };
                 }
             }
