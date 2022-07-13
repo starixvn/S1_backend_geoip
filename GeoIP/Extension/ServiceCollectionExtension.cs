@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Linq;
+using GeoIP.Core.DAL;
 using GeoIP.Core.Library;
 using GeoIP.Core.Models;
 using Microsoft.Extensions.Configuration;
@@ -22,5 +24,20 @@ namespace GeoIP.WebApi.Extension
 
             return services;
         }
+        
+        public static IServiceCollection AddBlockIpByDb(this IServiceCollection services)
+        {
+            var provider = services.BuildServiceProvider();
+            var dataLayers = provider.GetRequiredService<IMemberBlockIpDataLayers>();
+            services.AddSingleton(p => new BlockedIp(dataLayers.GetBlockIp().ToList()));
+            return services;
+        }
+        public static IServiceCollection AddAllowedIpByDb(this IServiceCollection services)
+        {
+            var provider = services.BuildServiceProvider();
+            var dataLayers = provider.GetRequiredService<IMemberAllowIpDataLayers>();
+            services.AddSingleton(p => new AllowedIp(dataLayers.GetAllowIp().ToList()));
+            return services;
+        } 
     }
 }

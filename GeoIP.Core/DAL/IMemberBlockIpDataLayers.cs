@@ -6,6 +6,6 @@ namespace GeoIP.Core.DAL
 {
     public interface IMemberBlockIpDataLayers
     {
-        Task<IEnumerable<string>> GetBlockIp();
+        IEnumerable<string> GetBlockIp();
     }
 }

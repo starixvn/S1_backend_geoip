@@ -15,9 +15,9 @@ namespace GeoIP.Core.DAL
             _sqlClient = sqlClients.First(a => a.DataBase == DataBase.IPTable);
         }
 
-        public async Task<IEnumerable<string>> GetBlockIp()
+        public IEnumerable<string> GetBlockIp()
         {
-            return await _sqlClient.QueryAsync<string>("Service_BlockIP_Get", null);
+            return _sqlClient.Query<string>("Service_BlockIP_Get", null);
         }
     }
 }

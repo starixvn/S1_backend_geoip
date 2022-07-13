@@ -38,10 +38,12 @@ namespace GeoIP.WebApi
                 .AddSingleton<ILogger<GeoIpService>, Logger<GeoIpService>>()
                 .AddSingleton<GeoIpService>()
                 .AddSingleton<GeoIpSettings>()
-                .AddSingleton<BlockIP>()
                 .AddSingleton<IFile, FileLoader>()
                 .AddSingleton<IIpCountryDataLayers, IpCountryDataLayers>()
                 .AddSingleton<IMemberBlockIpDataLayers, MemberBlockIpDataLayers>()
+                .AddSingleton<IMemberAllowIpDataLayers, MemberAllowIpDataLayers>()
+                .AddBlockIpByDb()
+                .AddAllowedIpByDb()
                 .Configure<ForwardedHeadersOptions>(options =>
                 {
                     options.ForwardedHeaders = ForwardedHeaders.All;

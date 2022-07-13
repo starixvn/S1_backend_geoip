@@ -19,16 +19,13 @@ namespace GeoIP.WebApi.Controllers
     {
         private readonly GeoIpService _service;
         private readonly ILogger<CheckIpController> _logger;
-        private readonly GeoIpSettings _settings;
         
         public CheckIpController(GeoIpService service, IOptions<GeoIpSettings> settings,
             ILogger<CheckIpController> logger)
         {
             _service = service;
             _logger = logger;
-            _settings = settings.Value;
             _service.ApplyForbidden(new ForbiddenCountries(settings.Value.ForbiddenCountries));
-            _service.ApplyAllowedAreas(_service.LoadCsv(settings.Value.WhitelistCsvFile));
         }
         
         [HttpGet("{ip}")]
