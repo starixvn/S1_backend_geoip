@@ -1,4 +1,6 @@
-﻿using System.Data;
+﻿using System.Collections.Generic;
+using System.Data;
+using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
 using GeoIP.Core.Library;
@@ -10,9 +12,9 @@ namespace GeoIP.Core.DAL
     {
         private readonly IMySqlClient _sqlClient;
 
-        public IpCountryDataLayers(IMySqlClient sqlClient)
+        public IpCountryDataLayers(IEnumerable<IMySqlClient> sqlClients)
         {
-            _sqlClient = sqlClient;
+            _sqlClient = sqlClients.First(a => a.DataBase == DataBase.IPTable);;
         }
         public async Task<IPCountry> GetIpCountry(uint ip)
         {

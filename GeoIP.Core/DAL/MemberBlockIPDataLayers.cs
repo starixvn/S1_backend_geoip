@@ -12,7 +12,7 @@ namespace GeoIP.Core.DAL
 
         public MemberBlockIpDataLayers(IEnumerable<IMySqlClient> sqlClients)
         {
-            _sqlClient = sqlClients.First(a => a.DataBase == DataBase.IPTable);
+            _sqlClient = sqlClients.First(a => a.DataBase == DataBase.Report);
         }
 
         public IEnumerable<string> GetBlockIp()
