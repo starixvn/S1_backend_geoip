@@ -1,6 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Net.Http;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using GeoIP.WebApi.Models;
@@ -29,7 +32,12 @@ namespace GeoIP.WebApi
                 .ConfigureHostConfiguration(Configuration)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
-                    webBuilder.UseSerilog((hostContext, loggerConfiguration) =>
+                    webBuilder
+                        .ConfigureAppConfiguration((hostContext, builder) =>
+                        {
+                            builder.AddJsonStream(GetRemoteConfig(hostContext.Configuration.GetSection("ConfigService").Get<string[]>()));
+                        })
+                        .UseSerilog((hostContext, loggerConfiguration) =>
                         {
                             var serilogOption = new SerilogOption();
                             hostContext.Configuration.GetSection("Serilog").Bind(serilogOption);
@@ -44,8 +52,11 @@ namespace GeoIP.WebApi
                                 loggerConfiguration.MinimumLevel.Override(log.Name, log.Level);
                             }
 
+                            var excludesApiEndpoints = hostContext.Configuration.GetSection("ExcludesApiEndpoint").Get<string[]>();
                             loggerConfiguration.Filter.ByExcluding(p =>
-                                p.Properties["RequestPath"].ToString().Contains("health"));
+                                p.Properties.Any(q =>
+                                    excludesApiEndpoints.Any(item => q.Value.ToString().Contains(item))
+                                    ));
                             
                             switch (hostContext.HostingEnvironment.EnvironmentName)
                             {
@@ -79,8 +90,29 @@ namespace GeoIP.WebApi
                 .SetBasePath(AppContext.BaseDirectory)
                 .AddEnvironmentVariables()
                 .AddJsonFile($"appsettings.json", false, true)
-                .AddJsonFile(
-                    $"appsettings.{_env}.json",
-                    false, true);
+                .AddJsonFile($"appsettings.{_env}.json", false, true);
+
+        private static MemoryStream GetRemoteConfig(IEnumerable<string> remoteUrls)
+        {
+            using var client = new HttpClient();
+            Stream result = null;
+            foreach (var url in remoteUrls)
+            {
+                if (string.IsNullOrEmpty(url))
+                {
+                    continue;
+                }
+
+                try
+                {
+                    result = client.GetAsync(url).Result.Content.ReadAsStreamAsync().Result;
+                    break;
+                }
+                catch { }
+            }
+
+            using var streamReader = new StreamReader(result);
+            return new MemoryStream(Encoding.UTF8.GetBytes(streamReader.ReadToEnd()));
+        }
     }
 }

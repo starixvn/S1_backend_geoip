@@ -24,10 +24,11 @@ namespace GeoIP.UnitTest
         {
             var forbiddenCountry = new ForbiddenCountries(new[] {"SE", "SG", "TR", "TW", "US", "VG"});
             var logger = Substitute.For<ILogger<GeoIpService>>();
-            var file = Substitute.For<IFile>();
+            var blockIp = new BlockedIp(new List<string>());
+            var allowedIp = new AllowedIp(new List<string>());
             var ipCountryDal = Substitute.For<IIpCountryDataLayers>();
             ipCountryDal.GetIpCountry(Arg.Is<uint>(618989922)).Returns(x => new IPCountry() {Code = "TW"});
-            var geoIp = new GeoIpService(file, logger, ipCountryDal);
+            var geoIp = new GeoIpService(logger, blockIp, allowedIp, ipCountryDal);
             geoIp.ApplyForbidden(forbiddenCountry);
             var country = await geoIp.Check("36.229.9.98");
 
@@ -38,10 +39,11 @@ namespace GeoIP.UnitTest
         public void Illegal_IP_should_handle_IPFormatException()
         {
             var logger = Substitute.For<ILogger<GeoIpService>>();
-            var file = Substitute.For<IFile>();
+            var blockIp = new BlockedIp(new List<string>());
+            var allowedIp = new AllowedIp(new List<string>());
             var ipCountryDal = Substitute.For<IIpCountryDataLayers>();
             ipCountryDal.GetIpCountry(Arg.Is<uint>(618989922)).Returns(x => new IPCountry() {Code = "TW"});
-            var geoIp = new GeoIpService(file, logger, ipCountryDal);
+            var geoIp = new GeoIpService(logger, blockIp, allowedIp, ipCountryDal);
             geoIp.Invoking(g => g.Check("61").Result
                     .Message.Should()
                     .BeEquivalentTo("IP format error"))
@@ -55,12 +57,14 @@ namespace GeoIP.UnitTest
         {
             var logger = Substitute.For<ILogger<GeoIpService>>();
             var file = Substitute.For<IFile>();
+            var blockIp = new BlockedIp(new List<string>());
+            var allowedIp = new AllowedIp(new List<string>());
             var ipCountryDal = Substitute.For<IIpCountryDataLayers>();
-            var service = new GeoIpService(file, logger, ipCountryDal);
+            var geoIp = new GeoIpService(logger, blockIp, allowedIp, ipCountryDal);
 
-            service.Check("61");
+            geoIp.Check("61");
 
-            logger.Received().LogWarning(Arg.Any<IPFormatException>(), Arg.Any<string>());
+            logger.Received(1).LogError(Arg.Any<IPFormatException>(), Arg.Any<string>());
         }
         
         [Test]
@@ -74,12 +78,13 @@ namespace GeoIP.UnitTest
             });
 
             var logger = Substitute.For<ILogger<GeoIpService>>();
-            var file = Substitute.For<IFile>();
+            var blockIp = new BlockedIp(new List<string>());
+            var allowedIp = new AllowedIp(new List<string>());
             var ipCountryDal = Substitute.For<IIpCountryDataLayers>();
-            var service = new GeoIpService(file, logger, ipCountryDal);
-            service.ApplyForbidden(forbiddenCountries);
+            var geoIp = new GeoIpService(logger, blockIp, allowedIp, ipCountryDal);
+            geoIp.ApplyForbidden(forbiddenCountries);
 
-            var country = await service.Check(ipv6);
+            var country = await geoIp.Check(ipv6);
             country.Code.Should()
                 .BeEmpty();
             country.Message.Should()
@@ -89,7 +94,7 @@ namespace GeoIP.UnitTest
         [Test]
         public async Task Empty_CountryCode_should_be_forbidden()
         {
-            var ipv6 = "192.168.1.1";
+            var ip = "192.168.1.1";
             var forbiddenCountries = new ForbiddenCountries(new List<string>
             {
                 "TW",
@@ -98,13 +103,14 @@ namespace GeoIP.UnitTest
             });
 
             var logger = Substitute.For<ILogger<GeoIpService>>();
-            var file = Substitute.For<IFile>();
+            var blockIp = new BlockedIp(new List<string>());
+            var allowedIp = new AllowedIp(new List<string>());
             var ipCountryDal = Substitute.For<IIpCountryDataLayers>();
             ipCountryDal.GetIpCountry(Arg.Is(3232235777)).Returns(x => new IPCountry() {Code = "-"});
-            var service = new GeoIpService(file, logger, ipCountryDal);
-            service.ApplyForbidden(forbiddenCountries);
+            var geoIp = new GeoIpService(logger, blockIp, allowedIp, ipCountryDal);
+            geoIp.ApplyForbidden(forbiddenCountries);
 
-            var country = await service.Check(ipv6);
+            var country = await geoIp.Check(ip);
             country.Code.Should().Be("-");
             country.Forbidden.Should()
                 .Be(true);
@@ -117,62 +123,22 @@ namespace GeoIP.UnitTest
                 "TW",
                 ""
             });
-            var allowedIPRange = new List<IPRange>()
-            {
-                new IPRange
-                {
-                    Description = "ailab VPN",
-                    To = 2112066662,
-                    From = 2112066662
-                }
-            };
-            var whiteList = new AllowedAreas(allowedIPRange);
             var twIP = "125.227.148.102";
 
             var logger = Substitute.For<ILogger<GeoIpService>>();
-            var file = Substitute.For<IFile>();
+            var blockIp = new BlockedIp(new List<string>());
+            var allowedIp = new AllowedIp(new List<string>() { "125.227.148.102" });
             var ipCountryDal = Substitute.For<IIpCountryDataLayers>();
             ipCountryDal.GetIpCountry(Arg.Is<uint>(2112066662)).Returns(x => new IPCountry() {Code = "TW"});
-            var service = new GeoIpService(file, logger, ipCountryDal);
-            service.ApplyForbidden(forbiddendCountries);
-            service.ApplyAllowedAreas(whiteList);
+            var geoIp = new GeoIpService(logger, blockIp, allowedIp, ipCountryDal);
+            geoIp.ApplyForbidden(forbiddendCountries);
 
-            var country = await service.Check(twIP);
+            var country = await geoIp.Check(twIP);
 
             country.Code.Should()
                 .Be("TW");
             country.Forbidden.Should()
                 .Be(false);
-        }
-        
-        [Test]
-        public void Load_whitelist_file_should_return_AllowedAreas()
-        {
-            var logger = Substitute.For<ILogger<GeoIpService>>();
-            var file = Substitute.For<IFile>();
-            var ipRanges = new List<IPRange>()
-            {
-                new IPRange
-                {
-                    Description = "ailab VPN",
-                    To = 2112066662,
-                    From = 2112066662
-                }
-            };
-
-            file.Read(Arg.Any<string>())
-                .Returns(ipRanges);
-            var ipCountryDal = Substitute.For<IIpCountryDataLayers>();
-            ipCountryDal.GetIpCountry(Arg.Is<uint>(2112066662)).Returns(x => new IPCountry() {Code = "TW"});
-            var service = new GeoIpService(file, logger, ipCountryDal);
-            string whitelistFile = "./Data/IPInfo_WhiteList.csv";
-            var allowedAreas = service.LoadCsv(whitelistFile);
-
-            file.Received(1)
-                .Read(Arg.Any<string>());
-            allowedAreas.Exists(2112066662)
-                .Should()
-                .Be(true);
         }
     }
 }

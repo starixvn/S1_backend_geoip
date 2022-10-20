@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using GeoIP.Core.DAL;
 using GeoIP.Core.Models;
@@ -9,31 +10,33 @@ namespace GeoIP.Core
 {
     public class GeoIpService
     {
-        private readonly IFile _file;
         private readonly ILogger<GeoIpService> _logger;
         private readonly IIpCountryDataLayers _ipCountry;
         private ForbiddenCountries _forbiddenCountries = new ForbiddenCountries(new[] {""});
-        private AllowedAreas _whiteList = new AllowedAreas(new List<IPRange>());
+        private readonly BlockedIp _blockedIp;
+        private readonly AllowedIp _allowedIp;
 
-        public GeoIpService(IFile file, ILogger<GeoIpService> logger, IIpCountryDataLayers ipCountry)
+        public GeoIpService(ILogger<GeoIpService> logger, BlockedIp blockedIp, AllowedIp allowedIp, IIpCountryDataLayers ipCountry)
         {
-            _file = file;
             _logger = logger;
             _ipCountry = ipCountry;
+            _allowedIp = allowedIp;
+            _blockedIp = blockedIp;
         }
         public async Task<Country> Check(string ipAddress)
         {
             var country = new Country();
             try
             {
-                var uip = _whiteList.GetIpToLong(ipAddress);
+                var uip = IpConvert.GetIpToLong(ipAddress);
                 var ipCountry = await _ipCountry.GetIpCountry(uip);
                 if (ipCountry != null)
                 {
                     return new Country()
                     {
                         Code = ipCountry.Code,
-                        Forbidden = !_whiteList.Exists(uip) && _forbiddenCountries.Exists(ipCountry.Code),
+                        Forbidden = _blockedIp.Exists(ipAddress) || 
+                                    (_forbiddenCountries.Exists(ipCountry.Code) && !_allowedIp.Exists(ipAddress)),
                     };
                 }
             }
@@ -49,18 +52,6 @@ namespace GeoIP.Core
         public void ApplyForbidden(ForbiddenCountries forbiddenCountries)
         {
             _forbiddenCountries = forbiddenCountries;
-        }
-
-        public void ApplyAllowedAreas(AllowedAreas whiteList)
-        {
-            _whiteList = whiteList;
-        }
-
-        public AllowedAreas LoadCsv(string whiteListFile)
-        {
-            var ranges = _file.Read(whiteListFile);
-            var allowedAreas = new AllowedAreas(ranges);
-            return allowedAreas;
         }
     }
 }
