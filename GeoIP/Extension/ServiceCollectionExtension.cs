@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using GeoIP.Core;
 using GeoIP.Core.DAL;
 using GeoIP.Core.Library;
 using GeoIP.Core.Models;
@@ -24,7 +25,26 @@ namespace GeoIP.WebApi.Extension
 
             return services;
         }
-        
+
+        public static IServiceCollection RegisterServices(this IServiceCollection services, IConfiguration configuration)
+        {
+            services
+                .Configure<GeoIpSettings>(option =>
+                {
+                    configuration.GetSection("GeoIpSettings").Bind(option);
+                })
+                .AddSingleton<ILogger<GeoIpService>, Logger<GeoIpService>>()
+                .AddSingleton<GeoIpService>()
+                .AddSingleton<GeoIpSettings>()
+                .AddSingleton<IFile, FileLoader>()
+                .AddSingleton<IIpCountryDataLayers, IpCountryDataLayers>()
+                .AddSingleton<IMemberBlockIpDataLayers, MemberBlockIpDataLayers>()
+                .AddSingleton<IMemberAllowIpDataLayers, MemberAllowIpDataLayers>()
+                .AddBlockIpByDb()
+                .AddAllowedIpByDb();
+            return services;
+        }
+
         public static IServiceCollection AddBlockIpByDb(this IServiceCollection services)
         {
             var provider = services.BuildServiceProvider();
