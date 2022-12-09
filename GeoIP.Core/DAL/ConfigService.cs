@@ -10,16 +10,16 @@ namespace GeoIP.Core.DAL
 {
     public class ConfigService
     {
-        private readonly MySqlClient _reportDbClient;
+        private readonly IMySqlClient _sqlClient;
 
-        public ConfigService(IServiceProvider provider)
+        public ConfigService(IEnumerable<IMySqlClient> sqlClients)
         {
-            _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);
+            _sqlClient = sqlClients.First(p => p.DataBase == DataBase.IPTable);
         }
 
         public IEnumerable<T> Query<T>(string sql, object parameters = null)
         {
-            return _reportDbClient.Query<T>(sql, parameters);
+            return _sqlClient.Query<T>(sql, parameters);
         }
     }
 }
