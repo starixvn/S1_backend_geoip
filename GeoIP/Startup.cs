@@ -52,6 +52,7 @@ namespace GeoIP.WebApi
                 .AddControllers()
                 .AddMvcOptions(x => { x.EnableEndpointRouting = false; })
                 .SetCompatibilityVersion(CompatibilityVersion.Latest);
+            services.AddSingleton<ConfigService>();
             services.AddOptionListByDB<IEnumerable<IPCountry>>("Service_IPCode_Get");
         }
 

@@ -14,7 +14,7 @@ namespace GeoIP.Core.DAL
 
         public ConfigService(IServiceProvider provider)
         {
-            _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);
+            _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
         }
 
         public IEnumerable<T> Query<T>(string sql, object parameters = null)
