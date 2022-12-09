@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Emit;
 using System.Threading.Tasks;
 using GeoIP.Core.DAL;
 using GeoIP.Core.Models;
@@ -15,13 +16,15 @@ namespace GeoIP.Core
         private ForbiddenCountries _forbiddenCountries = new ForbiddenCountries(new[] {""});
         private readonly BlockedIp _blockedIp;
         private readonly AllowedIp _allowedIp;
+        private readonly IEnumerable<IPCountry> _ipCode;
 
-        public GeoIpService(ILogger<GeoIpService> logger, BlockedIp blockedIp, AllowedIp allowedIp, IIpCountryDataLayers ipCountry)
+        public GeoIpService(ILogger<GeoIpService> logger, BlockedIp blockedIp, AllowedIp allowedIp, IIpCountryDataLayers ipCountry, IEnumerable<IPCountry> ipCode = null)
         {
             _logger = logger;
             _ipCountry = ipCountry;
             _allowedIp = allowedIp;
             _blockedIp = blockedIp;
+            _ipCode = ipCode;
         }
         public async Task<Country> Check(string ipAddress)
         {
@@ -29,7 +32,8 @@ namespace GeoIP.Core
             try
             {
                 var uip = IpConvert.GetIpToLong(ipAddress);
-                var ipCountry = await _ipCountry.GetIpCountry(uip);
+                var ipCountry = _ipCode.ToList().Find(x => x.IpFrom < uip && x.IpTo > uip);
+                //var ipCountry = await _ipCountry.GetIpCountry(uip);
                 if (ipCountry != null)
                 {
                     return new Country()

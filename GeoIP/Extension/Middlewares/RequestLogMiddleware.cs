@@ -37,7 +37,7 @@ namespace GeoIP.WebApi.Extension.Middlewares
                 var requestBodyText = new StreamReader(requestBodyStream).ReadToEndAsync();
                 var headers = context.Request.Headers;
                 
-                LogContext.PushProperty("header", await JsonConvert.SerializeObjectAsync(headers));
+                LogContext.PushProperty("header", JsonConvert.SerializeObject(headers));
                 if (!context.Request.Headers.TryGetValue("X-Forwarded-For", out var ip))
                 {
                     ip = context.Connection.RemoteIpAddress.MapToIPv4()

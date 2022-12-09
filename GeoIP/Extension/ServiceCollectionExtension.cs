@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using GeoIP.Core.DAL;
 using GeoIP.Core.Library;
@@ -24,7 +25,7 @@ namespace GeoIP.WebApi.Extension
 
             return services;
         }
-        
+
         public static IServiceCollection AddBlockIpByDb(this IServiceCollection services)
         {
             var provider = services.BuildServiceProvider();
@@ -38,6 +39,15 @@ namespace GeoIP.WebApi.Extension
             var dataLayers = provider.GetRequiredService<IMemberAllowIpDataLayers>();
             services.AddSingleton(p => new AllowedIp(dataLayers.GetAllowIp().ToList()));
             return services;
-        } 
+        }
+
+        public static IServiceCollection AddOptionListByDB<T>(this IServiceCollection services, string sql, object parameters = null)
+        {
+            var provider = services.BuildServiceProvider();
+            var configService = provider.GetRequiredService<ConfigService>();
+            var option = configService.Query<T>(sql, parameters);
+            services.AddSingleton(typeof(IEnumerable<T>), p => option);
+            return services;
+        }
     }
 }
