@@ -22,11 +22,5 @@ namespace GeoIP.Core.DAL
             parameters.Add("Ip", ip, DbType.UInt32);
             return await _sqlClient.QueryFirstAsync<IPCountry>("Service_IPCountry_Get", parameters);
         }
-
-        public IEnumerable<IPCountry> GetIpCode()
-        {
-            var parameters = new DynamicParameters();
-            return  _sqlClient.Query<IPCountry>("Service_IPCode_Get", parameters);
-        }
     }
 }
