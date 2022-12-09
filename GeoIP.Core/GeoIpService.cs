@@ -32,7 +32,7 @@ namespace GeoIP.Core
             try
             {
                 var uip = IpConvert.GetIpToLong(ipAddress);
-                var ipCountry = _ipCode.ToList().Find(x => x.IpFrom < uip && x.IpTo > uip);
+                var ipCountry = _ipCode.FirstOrDefault(x => x.IpFrom < uip && x.IpTo > uip);
                 //var ipCountry = await _ipCountry.GetIpCountry(uip);
                 if (ipCountry != null)
                 {
