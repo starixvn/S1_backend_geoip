@@ -14,7 +14,7 @@ namespace GeoIP.Core.DAL
 
         public IpCountryDataLayers(IEnumerable<IMySqlClient> sqlClients)
         {
-            _sqlClient = sqlClients.First(a => a.DataBase == DataBase.IPTable);;
+            _sqlClient = sqlClients.First(a => a.DataBase == DataBase.IPTable);
         }
         public async Task<IPCountry> GetIpCountry(uint ip)
         {

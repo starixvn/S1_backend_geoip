@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using GeoIP.Core;
 using GeoIP.Core.DAL;
@@ -36,12 +37,14 @@ namespace GeoIP.WebApi.Extension
                 .AddSingleton<ILogger<GeoIpService>, Logger<GeoIpService>>()
                 .AddSingleton<GeoIpService>()
                 .AddSingleton<GeoIpSettings>()
+                .AddSingleton<ConfigService>()
                 .AddSingleton<IFile, FileLoader>()
                 .AddSingleton<IIpCountryDataLayers, IpCountryDataLayers>()
                 .AddSingleton<IMemberBlockIpDataLayers, MemberBlockIpDataLayers>()
                 .AddSingleton<IMemberAllowIpDataLayers, MemberAllowIpDataLayers>()
                 .AddBlockIpByDb()
                 .AddAllowedIpByDb();
+            services.AddOptionListByDB<IPCountry>("Service_IPCode_Get");
             return services;
         }
 
@@ -58,6 +61,15 @@ namespace GeoIP.WebApi.Extension
             var dataLayers = provider.GetRequiredService<IMemberAllowIpDataLayers>();
             services.AddSingleton(p => new AllowedIp(dataLayers.GetAllowIp().ToList()));
             return services;
-        } 
+        }
+
+        public static IServiceCollection AddOptionListByDB<T>(this IServiceCollection services, string sql, object parameters = null)
+        {
+            var provider = services.BuildServiceProvider();
+            var configService = provider.GetRequiredService<ConfigService>();
+            var option = configService.Query<T>(sql, parameters);
+            services.AddSingleton(typeof(IEnumerable<T>), p => option);
+            return services;
+        }
     }
 }
