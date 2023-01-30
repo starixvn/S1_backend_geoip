@@ -6,6 +6,7 @@
         Report,//ConnectionStringReport
         Wager,//ConnectionStringWager
         Log,//ConnectionStringLog
-        IPTable//ConnectionStringIPTable
+        IPTable,//ConnectionStringIPTable
+        ReportIPTable//ConnectionStringReportIPTable
     }
 }

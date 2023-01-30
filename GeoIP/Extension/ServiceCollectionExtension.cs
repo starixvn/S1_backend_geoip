@@ -22,7 +22,7 @@ namespace GeoIP.WebApi.Extension
             services.AddSingleton<IMySqlClient>(param =>
                     new MySqlClient(config.GetConnectionString($"{serviceType}_ReportDB"), logger, DataBase.Report))
                 .AddSingleton<IMySqlClient>(param =>
-                    new MySqlClient(config.GetConnectionString($"{serviceType}_ReportIPTable"), logger, DataBase.IPTable));
+                    new MySqlClient(config.GetConnectionString($"{serviceType}_ReportIPTable"), logger, DataBase.ReportIPTable));
 
             return services;
         }

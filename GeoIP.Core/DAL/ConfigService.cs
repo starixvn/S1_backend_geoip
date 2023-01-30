@@ -14,7 +14,7 @@ namespace GeoIP.Core.DAL
 
         public ConfigService(IEnumerable<IMySqlClient> sqlClients)
         {
-            _sqlClient = sqlClients.First(p => p.DataBase == DataBase.IPTable);
+            _sqlClient = sqlClients.First(p => p.DataBase == DataBase.ReportIPTable);
         }
 
         public IEnumerable<T> Query<T>(string sql, object parameters = null)
