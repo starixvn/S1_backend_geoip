@@ -1,14 +1,10 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
-using GeoIP.Core;
+﻿using GeoIP.Core;
 using GeoIP.Core.Models;
 using GeoIP.WebApi.Extension;
 using GeoIP.WebApi.Models;
+
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Microsoft.Extensions.Primitives;
 
 namespace GeoIP.WebApi.Controllers
 {
@@ -19,7 +15,7 @@ namespace GeoIP.WebApi.Controllers
     {
         private readonly GeoIpService _service;
         private readonly ILogger<CheckIpController> _logger;
-        
+
         public CheckIpController(GeoIpService service, IOptions<GeoIpSettings> settings,
             ILogger<CheckIpController> logger)
         {
@@ -27,7 +23,7 @@ namespace GeoIP.WebApi.Controllers
             _logger = logger;
             _service.ApplyForbidden(new ForbiddenCountries(settings.Value.ForbiddenCountries));
         }
-        
+
         [HttpGet("{ip}")]
         public async Task<ActionResult<CountryModel>> Get(string ip)
         {
@@ -40,10 +36,10 @@ namespace GeoIP.WebApi.Controllers
             };
 
             _logger.LogInformation($"IPAddress: [{ip}] CountryCode: [{country.Code}] Forbidden is {country.Forbidden}");
-            
+
             return Ok(countryModel);
         }
-        
+
         [HttpGet("ClientIp")]
         public async Task<ActionResult<IPCountryModel>> GetAndCheckClientIP()
         {
@@ -54,7 +50,7 @@ namespace GeoIP.WebApi.Controllers
                 Code = country.Code,
                 Forbidden = country.Forbidden,
                 Message = country.Message,
-                RemoteIpAddress= ip
+                RemoteIpAddress = ip
             };
 
             _logger.LogInformation($"IPAddress: [{ip}] CountryCode: [{country.Code}] Forbidden is {country.Forbidden}");

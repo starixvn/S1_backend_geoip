@@ -2,7 +2,9 @@
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
+
 using Dapper;
+
 using GeoIP.Core.Library;
 using GeoIP.Core.Models;
 

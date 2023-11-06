@@ -1,9 +1,4 @@
-﻿using System.IO;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Logging;
-
-namespace GeoIP.WebApi.Extension.Middlewares
+﻿namespace GeoIP.WebApi.Extension.Middlewares
 {
     public class ResponseLogMiddleware
     {

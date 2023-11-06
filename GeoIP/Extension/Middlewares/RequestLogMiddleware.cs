@@ -1,10 +1,4 @@
-﻿using System.IO;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Extensions;
-using Microsoft.Extensions.Logging;
-using System.Text.Json;
-using Serilog.Context;
+﻿using Microsoft.AspNetCore.Http.Extensions;
 
 namespace GeoIP.WebApi.Extension.Middlewares
 {
