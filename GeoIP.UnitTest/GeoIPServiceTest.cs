@@ -1,12 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+
 using FluentAssertions;
+
 using GeoIP.Core;
 using GeoIP.Core.DAL;
 using GeoIP.Core.Models;
+
 using Microsoft.Extensions.Logging;
+
 using NSubstitute;
+
 using NUnit.Framework;
 
 namespace GeoIP.UnitTest
@@ -22,19 +26,19 @@ namespace GeoIP.UnitTest
         [Test]
         public async Task IP_from_TW_Should_return_forbidden_when_applied_ForbiddenCountries()
         {
-            var forbiddenCountry = new ForbiddenCountries(new[] {"SE", "SG", "TR", "TW", "US", "VG"});
+            var forbiddenCountry = new ForbiddenCountries(new[] { "SE", "SG", "TR", "TW", "US", "VG" });
             var logger = Substitute.For<ILogger<GeoIpService>>();
             var blockIp = new BlockedIp(new List<string>());
             var allowedIp = new AllowedIp(new List<string>());
             var ipCountryDal = Substitute.For<IIpCountryDataLayers>();
-            ipCountryDal.GetIpCountry(Arg.Is<uint>(618989922)).Returns(x => new IPCountry() {Code = "TW"});
+            ipCountryDal.GetIpCountry(Arg.Is<uint>(618989922)).Returns(x => new IPCountry() { Code = "TW" });
             var geoIp = new GeoIpService(logger, blockIp, allowedIp, ipCountryDal);
             geoIp.ApplyForbidden(forbiddenCountry);
             var country = await geoIp.Check("36.229.9.98");
 
             country.Forbidden.Should().Be(true);
         }
-        
+
         [Test]
         public void Illegal_IP_should_handle_IPFormatException()
         {
@@ -42,7 +46,7 @@ namespace GeoIP.UnitTest
             var blockIp = new BlockedIp(new List<string>());
             var allowedIp = new AllowedIp(new List<string>());
             var ipCountryDal = Substitute.For<IIpCountryDataLayers>();
-            ipCountryDal.GetIpCountry(Arg.Is<uint>(618989922)).Returns(x => new IPCountry() {Code = "TW"});
+            ipCountryDal.GetIpCountry(Arg.Is<uint>(618989922)).Returns(x => new IPCountry() { Code = "TW" });
             var geoIp = new GeoIpService(logger, blockIp, allowedIp, ipCountryDal);
             geoIp.Invoking(g => g.Check("61").Result
                     .Message.Should()
@@ -66,7 +70,7 @@ namespace GeoIP.UnitTest
 
             logger.Received(1).LogError(Arg.Any<IPFormatException>(), Arg.Any<string>());
         }
-        
+
         [Test]
         public async Task IPv6_IP_should_return_not_support()
         {
@@ -90,7 +94,7 @@ namespace GeoIP.UnitTest
             country.Message.Should()
                 .Be("no support ipv6");
         }
-        
+
         [Test]
         public async Task Empty_CountryCode_should_be_forbidden()
         {
@@ -106,7 +110,7 @@ namespace GeoIP.UnitTest
             var blockIp = new BlockedIp(new List<string>());
             var allowedIp = new AllowedIp(new List<string>());
             var ipCountryDal = Substitute.For<IIpCountryDataLayers>();
-            ipCountryDal.GetIpCountry(Arg.Is(3232235777)).Returns(x => new IPCountry() {Code = "-"});
+            ipCountryDal.GetIpCountry(Arg.Is(3232235777)).Returns(x => new IPCountry() { Code = "-" });
             var geoIp = new GeoIpService(logger, blockIp, allowedIp, ipCountryDal);
             geoIp.ApplyForbidden(forbiddenCountries);
 
@@ -129,7 +133,7 @@ namespace GeoIP.UnitTest
             var blockIp = new BlockedIp(new List<string>());
             var allowedIp = new AllowedIp(new List<string>() { "125.227.148.102" });
             var ipCountryDal = Substitute.For<IIpCountryDataLayers>();
-            ipCountryDal.GetIpCountry(Arg.Is<uint>(2112066662)).Returns(x => new IPCountry() {Code = "TW"});
+            ipCountryDal.GetIpCountry(Arg.Is<uint>(2112066662)).Returns(x => new IPCountry() { Code = "TW" });
             var geoIp = new GeoIpService(logger, blockIp, allowedIp, ipCountryDal);
             geoIp.ApplyForbidden(forbiddendCountries);
 

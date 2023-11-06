@@ -1,13 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using GeoIP.Core;
+﻿using GeoIP.Core;
 using GeoIP.Core.DAL;
 using GeoIP.Core.Library;
 using GeoIP.Core.Models;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 
 namespace GeoIP.WebApi.Extension
 {

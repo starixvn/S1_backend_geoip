@@ -1,19 +1,21 @@
 using GeoIP.WebApi.Extension;
 using GeoIP.WebApi.Extension.Middlewares;
-using GeoIP.WebApi.Models;
+
 using Serilog;
 using Serilog.Exceptions;
-using Serilog.Formatting.Json;
 
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Configuration.AddRemoteJsonConfig(builder.Configuration.GetSection("ConfigService").Get<string[]>());
+
+var remoteUrls = builder.Configuration.GetSection("ConfigService").Get<string[]>();
+remoteUrls = builder.Configuration.CheckLocalConfig(builder.Environment, args, remoteUrls);
+builder.Configuration.AddRemoteJsonConfig(remoteUrls);
 
 builder.Host.UseSerilog((context, configuration) =>
 {
     var excludesMessage = builder.Configuration.GetSection("ExcludesMessage").Get<string[]>();
     var excludesApiEndpoints = builder.Configuration.GetSection("ExcludesApiEndpoint").Get<string[]>();
-    
+
     configuration
         .ReadFrom.Configuration(builder.Configuration)
         .Enrich.FromLogContext()

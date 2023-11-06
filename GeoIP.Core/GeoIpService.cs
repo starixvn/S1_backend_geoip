@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Reflection.Emit;
 using System.Threading.Tasks;
+
 using GeoIP.Core.DAL;
 using GeoIP.Core.Models;
+
 using Microsoft.Extensions.Logging;
 
 namespace GeoIP.Core
@@ -13,7 +13,7 @@ namespace GeoIP.Core
     {
         private readonly ILogger<GeoIpService> _logger;
         private readonly IIpCountryDataLayers _ipCountry;
-        private ForbiddenCountries _forbiddenCountries = new ForbiddenCountries(new[] {""});
+        private ForbiddenCountries _forbiddenCountries = new ForbiddenCountries(new[] { "" });
         private readonly BlockedIp _blockedIp;
         private readonly AllowedIp _allowedIp;
         private readonly IEnumerable<IPCountry> _ipCode;
@@ -39,7 +39,7 @@ namespace GeoIP.Core
                     return new Country()
                     {
                         Code = ipCountry.Code,
-                        Forbidden = _blockedIp.Exists(ipAddress) || 
+                        Forbidden = _blockedIp.Exists(ipAddress) ||
                                     (_forbiddenCountries.Exists(ipCountry.Code) && !_allowedIp.Exists(ipAddress)),
                     };
                 }
@@ -49,10 +49,10 @@ namespace GeoIP.Core
                 country.Message = e.Message;
                 _logger.LogError(e, $"The IP: {ipAddress} occured {e.Message}.");
             }
-            
+
             return country;
         }
-        
+
         public void ApplyForbidden(ForbiddenCountries forbiddenCountries)
         {
             _forbiddenCountries = forbiddenCountries;

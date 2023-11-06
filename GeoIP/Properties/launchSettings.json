@@ -3,6 +3,7 @@
   "profiles": {
     "GeoIP.WebApi": {
       "commandName": "Project",
+      "commandLineArgs": "Nova", // Nova or Leobet
       "launchBrowser": true,
       "applicationUrl": "http://localhost:55688/GeoIp/CheckIp/ClientIp",
       "environmentVariables": {

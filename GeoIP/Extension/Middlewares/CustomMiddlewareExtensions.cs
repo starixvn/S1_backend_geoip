@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Builder;
-
-namespace GeoIP.WebApi.Extension.Middlewares
+﻿namespace GeoIP.WebApi.Extension.Middlewares
 {
     public static class CustomMiddlewareExtensions
     {

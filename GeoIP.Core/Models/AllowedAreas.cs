@@ -35,7 +35,7 @@ namespace GeoIP.Core.Models
                     throw new IPFormatException("ipv4 format error");
                 }
             }
-            else if(ipAddress.IndexOf(":", StringComparison.Ordinal) > 0)
+            else if (ipAddress.IndexOf(":", StringComparison.Ordinal) > 0)
             {
                 throw new IPFormatException("no support ipv6");
             }
