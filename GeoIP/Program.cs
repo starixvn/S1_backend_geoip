@@ -1,6 +1,6 @@
 using GeoIP.WebApi.Extension;
 using GeoIP.WebApi.Extension.Middlewares;
-
+using Prometheus;
 using Serilog;
 using Serilog.Exceptions;
 
@@ -33,11 +33,16 @@ builder.Services
 
 var app = builder.Build();
 app.UseRouting();
+app.UseHttpMetrics();
 app.UseRequestLogMiddleware();
 app.UseResponseLogMiddleware();
-
+app.UseHttpMetrics(options =>
+{
+    options.AddCustomLabel("host", context => context.Request.Host.Host);
+});
 app.UseEndpoints(endpoints =>
 {
+    endpoints.MapMetrics();
     endpoints.MapGet("/health", async context =>
     {
         await context.Response.WriteAsync($"OK");
