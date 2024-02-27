@@ -30,12 +30,33 @@ namespace GeoIP.Core
                 var ipCountry = await _ipCountry.GetIpCountry(uip);
                 if (ipCountry != null)
                 {
-                    return new Country()
+                    if (_allowedIp.Exists(ipAddress))
                     {
-                        Code = ipCountry.Code,
-                        Forbidden = _blockedIp.Exists(ipAddress) ||
-                                    (_forbiddenCountries.Exists(ipCountry.Code) && !_allowedIp.Exists(ipAddress)),
-                    };
+                        _logger.LogInformation($"IPAddress: [{ipAddress}] is in allow ip list.");
+                        return new Country()
+                        {
+                            Code = ipCountry.Code,
+                            Forbidden = false //access
+                        };
+                    }
+                    if (_blockedIp.Exists(ipAddress))
+                    {
+                        _logger.LogInformation($"IPAddress: [{ipAddress}] is in block ip list.");
+                        return new Country()
+                        {
+                            Code = ipCountry.Code,
+                            Forbidden = true //block
+                        };
+                    }
+                    if (_forbiddenCountries.Exists(ipCountry.Code))
+                    {
+                        _logger.LogInformation($"IPAddress: [{ipAddress}] CountryCode: [{country.Code}] is in block country list.");
+                        return new Country()
+                        {
+                            Code = ipCountry.Code,
+                            Forbidden = true //block
+                        };
+                    }
                 }
             }
             catch (IPFormatException e)
