@@ -30,15 +30,6 @@ namespace GeoIP.Core
                 var ipCountry = await _ipCountry.GetIpCountry(uip);
                 if (ipCountry != null)
                 {
-                    if (_allowedIp.Exists(ipAddress))
-                    {
-                        _logger.LogInformation($"IPAddress: [{ipAddress}] is in allow ip list.");
-                        return new Country()
-                        {
-                            Code = ipCountry.Code,
-                            Forbidden = false //access
-                        };
-                    }
                     if (_blockedIp.Exists(ipAddress))
                     {
                         _logger.LogInformation($"IPAddress: [{ipAddress}] is in block ip list.");
@@ -46,6 +37,15 @@ namespace GeoIP.Core
                         {
                             Code = ipCountry.Code,
                             Forbidden = true //block
+                        };
+                    }
+                    if (_allowedIp.Exists(ipAddress))
+                    {
+                        _logger.LogInformation($"IPAddress: [{ipAddress}] is in allow ip list.");
+                        return new Country()
+                        {
+                            Code = ipCountry.Code,
+                            Forbidden = false //access
                         };
                     }
                     if (_forbiddenCountries.Exists(ipCountry.Code))
