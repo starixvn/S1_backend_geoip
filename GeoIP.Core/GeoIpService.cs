@@ -53,15 +53,15 @@ namespace GeoIP.Core
                             Forbidden = false //access
                         };
                     }
-                    if (_forbiddenCountries.Exists(ipCountry.Code))
+                    if (!_forbiddenCountries.Exists(ipCountry.Code))
                     {
-                        _logger.LogInformation($"IPAddress: [{ipAddress}] CountryCode: [{country.Code}] is in block country list.");
                         return new Country()
                         {
                             Code = ipCountry.Code,
-                            Forbidden = true //block
+                            Forbidden = false //access
                         };
                     }
+                    _logger.LogInformation($"IPAddress: [{ipAddress}] CountryCode: [{country.Code}] is in block country list or can't recognize country code.");
                 }
             }
             catch (IPFormatException e)
