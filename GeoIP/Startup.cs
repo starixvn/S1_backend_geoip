@@ -1,5 +1,6 @@
 using System;
 using GeoIP.Core;
+using GeoIP.Core.BLL;
 using GeoIP.Core.DAL;
 using GeoIP.Core.Models;
 using GeoIP.WebApi.Extension;
@@ -31,14 +32,14 @@ namespace GeoIP.WebApi
             services.AddControllers();
             services
                 .AddDatabaseConnection(Configuration)
-                .Configure<GeoIpSettings>(option =>
-                {
-                    Configuration.GetSection("GeoIpSettings").Bind(option);
-                })
+                //.Configure<GeoIpSettings>(option =>
+                //{
+                //    Configuration.GetSection("GeoIpSettings").Bind(option);
+                //})
                 .AddSingleton<ILogger<GeoIpService>, Logger<GeoIpService>>()
                 .AddSingleton<GeoIpService>()
+                //.AddSingleton<GeoIpSettings>()
                 .AddSingleton<ConfigService>()
-                .AddSingleton<GeoIpSettings>()
                 .AddSingleton<IFile, FileLoader>()
                 .AddSingleton<IIpCountryDataLayers, IpCountryDataLayers>()
                 .AddSingleton<IMemberBlockIpDataLayers, MemberBlockIpDataLayers>()
@@ -54,7 +55,10 @@ namespace GeoIP.WebApi
                 .SetCompatibilityVersion(CompatibilityVersion.Latest);
 
             //處理SiteConfig
+            services.AddOptionListByDB<ServerInfo>("ServerInfoList_Get");
             services.AddOptionListByDB<ConfigObject>("SiteConfig_Get", new { ConfigGroup = "GeoIp" });
+            services.AddSiteConfig();
+            services.AddSingleton<ConfigBLL>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
