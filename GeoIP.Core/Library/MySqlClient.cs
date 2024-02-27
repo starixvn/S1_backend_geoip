@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 
 using Dapper;
@@ -11,6 +12,7 @@ using GeoIP.Core.Models;
 using Microsoft.Extensions.Logging;
 
 using MySql.Data.MySqlClient;
+using Serilog.Context;
 
 namespace GeoIP.Core.Library
 {
@@ -88,10 +90,18 @@ namespace GeoIP.Core.Library
         {
             IEnumerable<T> result;
             var sw = Stopwatch.StartNew();
+
             try
             {
                 using var connection = new MySqlConnection(_connectionString);
-                result = connection.Query<T>(sql, param: parameters, commandType: commandType);
+                var command = new CommandDefinition(sql, parameters, // 使用 CommandDefinition 不讓 Dapper 用預設值建立
+                    commandType: commandType,
+                    flags: CommandFlags.NoCache);
+
+                result = connection.Query<T>(command);
+                connection.Close();
+                connection.Dispose();
+
             }
             catch (Exception e)
             {
@@ -99,8 +109,10 @@ namespace GeoIP.Core.Library
                 throw;
             }
 
+            LogContext.PushProperty("ElapsedMilliseconds", sw.Elapsed.TotalMilliseconds);
             _logger.LogDebug($"{sql} {sw.Elapsed:c}");
-            return result;
+            return result.ToList();
+
         }
     }
 }

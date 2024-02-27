@@ -1,10 +1,9 @@
-﻿using GeoIP.Core;
-using GeoIP.Core.Models;
 using GeoIP.WebApi.Extension;
 using GeoIP.WebApi.Models;
-
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
+using GeoIP.Core;
+using GeoIP.Core.BLL;
+using GeoIP.Core.Models;
 
 namespace GeoIP.WebApi.Controllers
 {
@@ -16,12 +15,11 @@ namespace GeoIP.WebApi.Controllers
         private readonly GeoIpService _service;
         private readonly ILogger<CheckIpController> _logger;
 
-        public CheckIpController(GeoIpService service, IOptions<GeoIpSettings> settings,
-            ILogger<CheckIpController> logger)
+        public CheckIpController(GeoIpService service, ConfigBLL configBLL, ILogger<CheckIpController> logger)
         {
             _service = service;
             _logger = logger;
-            _service.ApplyForbidden(new ForbiddenCountries(settings.Value.ForbiddenCountries));
+            _service.ApplyForbidden(new ForbiddenCountries(configBLL.GetConfigValue<List<string>>("BlockCountry")));
         }
 
         [HttpGet("{ip}")]

@@ -26,7 +26,7 @@ namespace GeoIP.UnitTest
         [Test]
         public async Task IP_from_TW_Should_return_forbidden_when_applied_ForbiddenCountries()
         {
-            var forbiddenCountry = new ForbiddenCountries(new[] { "SE", "SG", "TR", "TW", "US", "VG" });
+            var forbiddenCountry = new ForbiddenCountries(new List<string>() { "SE", "SG", "TR", "TW", "US", "VG" });
             var logger = Substitute.For<ILogger<GeoIpService>>();
             var blockIp = new BlockedIp(new List<string>());
             var allowedIp = new AllowedIp(new List<string>());

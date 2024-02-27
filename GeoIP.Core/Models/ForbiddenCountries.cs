@@ -7,9 +7,9 @@ namespace GeoIP.Core.Models
     {
         public List<string> Countries { get; }
 
-        public ForbiddenCountries(IEnumerable<string> countries)
+        public ForbiddenCountries(List<string> countries)
         {
-            Countries = countries.ToList();
+            Countries = countries;
         }
 
         public bool Exists(string countryCode)
