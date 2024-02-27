@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
 using GeoIP.Core.Models;
@@ -79,6 +80,33 @@ namespace GeoIP.Core.Library
 
             _logger.LogTrace($"{name} {sw.Elapsed:c}");
             return result;
+        }
+
+        public IEnumerable<T> Query<T>(string sql, object parameters, CommandType commandType = CommandType.StoredProcedure)
+        {
+            IEnumerable<T> result;
+            var sw = Stopwatch.StartNew();
+
+            try
+            {
+                using var connection = new MySqlConnection(_connectionString);
+                var command = new CommandDefinition(sql, parameters, // 使用 CommandDefinition 不讓 Dapper 用預設值建立
+                    commandType: commandType,
+                    flags: CommandFlags.NoCache);
+
+                result = connection.Query<T>(command);
+                connection.Close();
+                connection.Dispose();
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, sql);
+                throw;
+            }
+
+            LogContext.PushProperty("ElapsedMilliseconds", sw.Elapsed.TotalMilliseconds);
+            _logger.LogDebug($"{sql} {sw.Elapsed:c}");
+            return result.ToList();
         }
     }
 }

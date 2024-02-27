@@ -37,6 +37,7 @@ namespace GeoIP.WebApi
                 })
                 .AddSingleton<ILogger<GeoIpService>, Logger<GeoIpService>>()
                 .AddSingleton<GeoIpService>()
+                .AddSingleton<ConfigService>()
                 .AddSingleton<GeoIpSettings>()
                 .AddSingleton<IFile, FileLoader>()
                 .AddSingleton<IIpCountryDataLayers, IpCountryDataLayers>()
@@ -51,6 +52,9 @@ namespace GeoIP.WebApi
                 .AddControllers()
                 .AddMvcOptions(x => { x.EnableEndpointRouting = false; })
                 .SetCompatibilityVersion(CompatibilityVersion.Latest);
+
+            //處理SiteConfig
+            services.AddOptionListByDB<ConfigObject>("SiteConfig_Get", new { ConfigGroup = "GeoIp" });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
