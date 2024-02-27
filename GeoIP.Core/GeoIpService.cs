@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using GeoIP.Core.BLL;
 using GeoIP.Core.DAL;
 using GeoIP.Core.Models;
 using Microsoft.Extensions.Logging;
@@ -13,18 +10,16 @@ namespace GeoIP.Core
     {
         private readonly ILogger<GeoIpService> _logger;
         private readonly IIpCountryDataLayers _ipCountry;
-        private ForbiddenCountries _forbiddenCountries = new ForbiddenCountries(new[] { "" });
+        private ForbiddenCountries _forbiddenCountries = new ForbiddenCountries(new List<string> { "" });
         private readonly BlockedIp _blockedIp;
         private readonly AllowedIp _allowedIp;
 
-        public GeoIpService(ILogger<GeoIpService> logger, BlockedIp blockedIp, AllowedIp allowedIp, IIpCountryDataLayers ipCountry, ConfigBLL configBLL)
+        public GeoIpService(ILogger<GeoIpService> logger, BlockedIp blockedIp, AllowedIp allowedIp, IIpCountryDataLayers ipCountry)
         {
             _logger = logger;
             _ipCountry = ipCountry;
             _allowedIp = allowedIp;
             _blockedIp = blockedIp;
-            var configBll = configBLL;
-            _forbiddenCountries = new ForbiddenCountries(configBll.GetConfigValue<IEnumerable<string>>("BlockCountry"));
         }
         public async Task<Country> Check(string ipAddress)
         {
