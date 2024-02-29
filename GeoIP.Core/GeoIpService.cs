@@ -48,6 +48,9 @@ namespace GeoIP.Core
                             Forbidden = false //access
                         };
                     }
+                    //最後一道防線，改用反向敘述
+                    //如果CountryCode沒有在forbiddenCountries清單中，則可以訪問，否則一律不可訪問
+                    //避免有IP無法判斷屬哪個國家的case
                     if (!_forbiddenCountries.Exists(ipCountry.Code))
                     {
                         return new Country()
