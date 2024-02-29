@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using GeoIP.Core;
 using GeoIP.Core.BLL;
 using GeoIP.Core.Models;
 using GeoIP.WebApi.Extension;
 using GeoIP.WebApi.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
+
 
 namespace GeoIP.WebApi.Controllers
 {

@@ -1,6 +1,4 @@
-﻿using System.Drawing;
-
-namespace GeoIP.Core.Models
+﻿namespace GeoIP.Core.Models
 {
     public class IPCountry
     {

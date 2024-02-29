@@ -1,12 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+
 using FluentAssertions;
+
 using GeoIP.Core;
 using GeoIP.Core.DAL;
 using GeoIP.Core.Models;
+
 using Microsoft.Extensions.Logging;
+
 using NSubstitute;
+
 using NUnit.Framework;
 
 namespace GeoIP.UnitTest

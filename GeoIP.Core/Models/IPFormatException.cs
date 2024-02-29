@@ -6,7 +6,7 @@ namespace GeoIP.Core.Models
     {
         public IPFormatException(string name) : base(name)
         {
-            
+
         }
     }
 }

@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+using GeoIP.Core;
+using GeoIP.Core.BLL;
 using GeoIP.Core.DAL;
 using GeoIP.Core.Library;
 using GeoIP.Core.Models;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 
 namespace GeoIP.WebApi.Extension
 {
@@ -21,8 +17,35 @@ namespace GeoIP.WebApi.Extension
             services.AddSingleton<IMySqlClient>(param =>
                     new MySqlClient(config.GetConnectionString($"{serviceType}_ReportDB"), logger, DataBase.Report))
                 .AddSingleton<IMySqlClient>(param =>
-                    new MySqlClient(config.GetConnectionString($"{serviceType}_IPTable"), logger, DataBase.IPTable));
+                    new MySqlClient(config.GetConnectionString($"{serviceType}_ReportIPTable"), logger, DataBase.ReportIPTable));
 
+            return services;
+        }
+
+        public static IServiceCollection RegisterServices(this IServiceCollection services, IConfiguration configuration)
+        {
+            services
+                .Configure<GeoIpSettings>(option =>
+                {
+                    configuration.GetSection("GeoIpSettings").Bind(option);
+                })
+                .AddSingleton<ILogger<GeoIpService>, Logger<GeoIpService>>()
+                .AddSingleton<GeoIpService>()
+                .AddSingleton<GeoIpSettings>()
+                .AddSingleton<ConfigService>()
+                .AddSingleton<IFile, FileLoader>()
+                .AddSingleton<IIpCountryDataLayers, IpCountryDataLayers>()
+                .AddSingleton<IMemberBlockIpDataLayers, MemberBlockIpDataLayers>()
+                .AddSingleton<IMemberAllowIpDataLayers, MemberAllowIpDataLayers>()
+                .AddBlockIpByDb()
+                .AddAllowedIpByDb();
+            services.AddOptionListByDB<IPCountry>("Service_IPCode_Get");
+
+            //處理SiteConfig
+            services.AddOptionListByDB<ServerInfo>("ServerInfoList_Get");
+            services.AddOptionListByDB<ConfigObject>("SiteConfig_Get", new { ConfigGroup = "GeoIp" });
+            services.AddSiteConfig();
+            services.AddSingleton<ConfigBLL>();
             return services;
         }
 
@@ -40,6 +63,7 @@ namespace GeoIP.WebApi.Extension
             services.AddSingleton(p => new AllowedIp(dataLayers.GetAllowIp().ToList()));
             return services;
         }
+
         public static IServiceCollection AddSiteConfig(this IServiceCollection services)
         {
             var provider = services.BuildServiceProvider();

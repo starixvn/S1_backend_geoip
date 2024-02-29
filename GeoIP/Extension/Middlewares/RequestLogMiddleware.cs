@@ -1,10 +1,4 @@
-﻿using System.IO;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Extensions;
-using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
-using Serilog.Context;
+﻿using Microsoft.AspNetCore.Http.Extensions;
 
 namespace GeoIP.WebApi.Extension.Middlewares
 {
@@ -37,14 +31,7 @@ namespace GeoIP.WebApi.Extension.Middlewares
                 var requestBodyText = new StreamReader(requestBodyStream).ReadToEndAsync();
                 var headers = context.Request.Headers;
 
-                LogContext.PushProperty("header", JsonConvert.SerializeObject(headers));
-                if (!context.Request.Headers.TryGetValue("X-Forwarded-For", out var ip))
-                {
-                    ip = context.Connection.RemoteIpAddress.MapToIPv4()
-                        .ToString();
-                }
-                _logger.LogInformation(
-                    $"REQUEST METHOD: {context.Request.Method}, REQUEST BODY: {await requestBodyText}, REQUEST URL: {url}, CLIENT_IP: {ip}");
+                _logger.LogInformation($"REQUEST METHOD: {context.Request.Method}, REQUEST BODY: {await requestBodyText}, REQUEST URL: {url}");
 
                 requestBodyStream.Seek(0, SeekOrigin.Begin);
                 context.Request.Body = requestBodyStream;

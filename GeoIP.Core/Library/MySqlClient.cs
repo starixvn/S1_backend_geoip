@@ -4,9 +4,13 @@ using System.Data;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+
 using Dapper;
+
 using GeoIP.Core.Models;
+
 using Microsoft.Extensions.Logging;
+
 using MySql.Data.MySqlClient;
 using Serilog.Context;
 
@@ -25,7 +29,7 @@ namespace GeoIP.Core.Library
             _logger = logger;
             DataBase = dataBase;
         }
-        
+
         public IEnumerable<T> Query<T>(string name, SqlMapper.IDynamicParameters parameters)
         {
             IEnumerable<T> result;
@@ -86,7 +90,6 @@ namespace GeoIP.Core.Library
         {
             IEnumerable<T> result;
             var sw = Stopwatch.StartNew();
-
             try
             {
                 using var connection = new MySqlConnection(_connectionString);

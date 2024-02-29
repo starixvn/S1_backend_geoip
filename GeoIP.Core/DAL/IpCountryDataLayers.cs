@@ -2,7 +2,9 @@
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
+
 using Dapper;
+
 using GeoIP.Core.Library;
 using GeoIP.Core.Models;
 
@@ -14,7 +16,7 @@ namespace GeoIP.Core.DAL
 
         public IpCountryDataLayers(IEnumerable<IMySqlClient> sqlClients)
         {
-            _sqlClient = sqlClients.First(a => a.DataBase == DataBase.IPTable);;
+            _sqlClient = sqlClients.First(a => a.DataBase == DataBase.ReportIPTable);
         }
         public async Task<IPCountry> GetIpCountry(uint ip)
         {
