@@ -1,4 +1,3 @@
-
 using GeoIP.Core;
 using GeoIP.Core.BLL;
 using GeoIP.Core.DAL;
@@ -40,7 +39,9 @@ namespace GeoIP.WebApi.Extension
                 .AddSingleton<IMemberAllowIpDataLayers, MemberAllowIpDataLayers>()
                 .AddBlockIpByDb()
                 .AddAllowedIpByDb();
-            services.AddOptionListByDB<IPCountry>("Service_IPCode_Get");
+
+            services.AddOptionListByIpTableDB<IPCountry>("Service_IPCode_Get");
+
             //處理SiteConfig
             services.AddOptionListByReportDb<ServerInfo>("ServerInfoList_Get");
             services.AddOptionListByReportDb<ConfigObject>("SiteConfig_Get", new { ConfigGroup = "GeoIp" });
@@ -84,8 +85,7 @@ namespace GeoIP.WebApi.Extension
 
             return services;
         }
-
-        public static IServiceCollection AddOptionListByDB<T>(this IServiceCollection services, string sql, object parameters = null)
+        public static IServiceCollection AddOptionListByIpTableDB<T>(this IServiceCollection services, string sql, object parameters = null)
         {
             var provider = services.BuildServiceProvider();
             var configService = provider.GetRequiredService<ConfigService>();

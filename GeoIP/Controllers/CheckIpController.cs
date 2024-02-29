@@ -1,9 +1,9 @@
-using GeoIP.WebApi.Extension;
-using GeoIP.WebApi.Models;
-using Microsoft.AspNetCore.Mvc;
 using GeoIP.Core;
 using GeoIP.Core.BLL;
 using GeoIP.Core.Models;
+using GeoIP.WebApi.Extension;
+using GeoIP.WebApi.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace GeoIP.WebApi.Controllers
 {

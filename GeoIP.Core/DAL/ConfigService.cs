@@ -3,7 +3,6 @@ using System.Linq;
 using GeoIP.Core.Library;
 using GeoIP.Core.Models;
 
-
 namespace GeoIP.Core.DAL
 {
     public class ConfigService
