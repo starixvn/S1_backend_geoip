@@ -64,6 +64,7 @@ namespace GeoIP.Core
                             Forbidden = true //block
                         };
                     }
+                    country.Code = ipCountry.Code;
                     country.Forbidden = false;
                 }
             }
