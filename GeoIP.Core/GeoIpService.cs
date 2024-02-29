@@ -57,7 +57,7 @@ namespace GeoIP.Core
                     if (string.IsNullOrWhiteSpace(ipCountry.Code)
                         || _forbiddenCountries.Exists(ipCountry.Code.Trim()))
                     {
-                        _logger.LogInformation($"IPAddress: [{ipAddress}] CountryCode: [{country.Code}] is in block country list or can't recognize country code.");
+                        _logger.LogInformation($"IPAddress: [{ipAddress}] CountryCode: [{ipCountry.Code}] is in block country list or can't recognize country code.");
                         return new Country()
                         {
                             Code = ipCountry.Code,
