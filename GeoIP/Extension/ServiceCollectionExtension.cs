@@ -39,11 +39,11 @@ namespace GeoIP.WebApi.Extension
                 .AddSingleton<IMemberAllowIpDataLayers, MemberAllowIpDataLayers>()
                 .AddBlockIpByDb()
                 .AddAllowedIpByDb();
-            services.AddOptionListByDB<IPCountry>("Service_IPCode_Get");
+            services.AddOptionListByIpTableDB<IPCountry>("Service_IPCode_Get");
 
             //處理SiteConfig
-            services.AddOptionListByDB<ServerInfo>("ServerInfoList_Get");
-            services.AddOptionListByDB<ConfigObject>("SiteConfig_Get", new { ConfigGroup = "GeoIp" });
+            services.AddOptionListByReportDB<ServerInfo>("ServerInfoList_Get");
+            services.AddOptionListByReportDB<ConfigObject>("SiteConfig_Get", new { ConfigGroup = "GeoIp" });
             services.AddSiteConfig();
             services.AddSingleton<ConfigBLL>();
             return services;
@@ -84,11 +84,19 @@ namespace GeoIP.WebApi.Extension
 
             return services;
         }
-        public static IServiceCollection AddOptionListByDB<T>(this IServiceCollection services, string sql, object parameters = null)
+        public static IServiceCollection AddOptionListByIpTableDB<T>(this IServiceCollection services, string sql, object parameters = null)
         {
             var provider = services.BuildServiceProvider();
             var configService = provider.GetRequiredService<ConfigService>();
             var option = configService.Query<T>(sql, parameters);
+            services.AddSingleton(typeof(IEnumerable<T>), p => option);
+            return services;
+        }
+        public static IServiceCollection AddOptionListByReportDB<T>(this IServiceCollection services, string sql, object parameters = null)
+        {
+            var provider = services.BuildServiceProvider();
+            var configService = provider.GetRequiredService<ConfigService>();
+            var option = configService.QueryByReportDb<T>(sql, parameters);
             services.AddSingleton(typeof(IEnumerable<T>), p => option);
             return services;
         }
