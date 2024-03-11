@@ -6,9 +6,9 @@ namespace GeoIP.Core.Models
     {
         private readonly List<string> _ipList;
 
-        public BlockedIp(List<string> ipList)
+        public BlockedIp(IEnumerable<string> ipList)
         {
-            _ipList = ipList;
+            _ipList = (List<string>)ipList;
         }
 
         public bool Exists(string ip)

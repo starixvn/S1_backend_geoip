@@ -3,11 +3,14 @@ using GeoIP.Core.BLL;
 using GeoIP.Core.DAL;
 using GeoIP.Core.Library;
 using GeoIP.Core.Models;
+using StackExchange.Redis;
+using Elastic.Apm.StackExchange.Redis;
 
 namespace GeoIP.WebApi.Extension
 {
     public static class ServiceCollectionExtension
     {
+
         public static IServiceCollection AddDatabaseConnection(this IServiceCollection services, IConfiguration config)
         {
             var provider = services.BuildServiceProvider();
@@ -18,6 +21,16 @@ namespace GeoIP.WebApi.Extension
                     new MySqlClient(config.GetConnectionString($"{serviceType}_ReportDB"), logger, DataBase.Report))
                 .AddSingleton<IMySqlClient>(param =>
                     new MySqlClient(config.GetConnectionString($"{serviceType}_ReportIPTable"), logger, DataBase.ReportIPTable));
+
+            return services;
+        }
+
+        public static IServiceCollection AddRedisConnection(this IServiceCollection services, IConfiguration config)
+        {
+            var redisConnection = ConnectionMultiplexer.Connect(config.GetValue<string>("RedisConnection"));
+            redisConnection.UseElasticApm();
+            services.AddSingleton<IConnectionMultiplexer>(redisConnection);
+            services.AddSingleton<ICacheHelper, RedisCacheHelper>();
 
             return services;
         }
@@ -33,12 +46,13 @@ namespace GeoIP.WebApi.Extension
                 .AddSingleton<GeoIpService>()
                 .AddSingleton<GeoIpSettings>()
                 .AddSingleton<ConfigService>()
+                .AddSingleton<AllowIpBLL>()
+                .AddSingleton<BlockIpBLL>()
                 .AddSingleton<IFile, FileLoader>()
                 .AddSingleton<IIpCountryDataLayers, IpCountryDataLayers>()
                 .AddSingleton<IMemberBlockIpDataLayers, MemberBlockIpDataLayers>()
-                .AddSingleton<IMemberAllowIpDataLayers, MemberAllowIpDataLayers>()
-                .AddBlockIpByDb()
-                .AddAllowedIpByDb();
+                .AddSingleton<IMemberAllowIpDataLayers, MemberAllowIpDataLayers>();
+
 
             services.AddOptionListByIpTableDB<IPCountry>("Service_IPCode_Get");
 
@@ -47,21 +61,6 @@ namespace GeoIP.WebApi.Extension
             services.AddOptionListByReportDb<ConfigObject>("SiteConfig_Get", new { ConfigGroup = "GeoIp" });
             services.AddSiteConfig();
             services.AddSingleton<ConfigBLL>();
-            return services;
-        }
-
-        public static IServiceCollection AddBlockIpByDb(this IServiceCollection services)
-        {
-            var provider = services.BuildServiceProvider();
-            var dataLayers = provider.GetRequiredService<IMemberBlockIpDataLayers>();
-            services.AddSingleton(p => new BlockedIp(dataLayers.GetBlockIp().ToList()));
-            return services;
-        }
-        public static IServiceCollection AddAllowedIpByDb(this IServiceCollection services)
-        {
-            var provider = services.BuildServiceProvider();
-            var dataLayers = provider.GetRequiredService<IMemberAllowIpDataLayers>();
-            services.AddSingleton(p => new AllowedIp(dataLayers.GetAllowIp().ToList()));
             return services;
         }
 

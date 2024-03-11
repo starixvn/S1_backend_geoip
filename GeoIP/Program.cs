@@ -48,6 +48,7 @@ void OverrideLoggerWriteToLFile(LoggerConfiguration configuration)
 
 builder.Services
     .AddDatabaseConnection(builder.Configuration)
+    .AddRedisConnection(builder.Configuration)
     .RegisterServices(builder.Configuration)
     .AddControllers();
 
