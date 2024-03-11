@@ -8,6 +8,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="Elastic.Apm.StackExchange.Redis" Version="1.26.0" />
         <PackageReference Include="Serilog.AspNetCore" Version="5.0.0" />
         <PackageReference Include="Serilog.Exceptions" Version="8.2.0" />
         <PackageReference Include="Serilog.Sinks.Console" Version="4.1.0" />
@@ -15,6 +16,7 @@
         <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
         <PackageReference Include="prometheus-net.AspNetCore" Version="8.0.1" />
         <PackageReference Include="prometheus-net.DotNetRuntime" Version="4.4.0" />
+        <PackageReference Include="StackExchange.Redis" Version="2.7.27" />
     </ItemGroup>
 
     <ItemGroup>

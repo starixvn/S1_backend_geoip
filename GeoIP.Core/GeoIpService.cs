@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-
+using GeoIP.Core.BLL;
 using GeoIP.Core.DAL;
 using GeoIP.Core.Models;
 
@@ -14,21 +14,26 @@ namespace GeoIP.Core
         private readonly ILogger<GeoIpService> _logger;
         private readonly IIpCountryDataLayers _ipCountry;
         private ForbiddenCountries _forbiddenCountries = new ForbiddenCountries(new List<string> { "" });
-        private readonly BlockedIp _blockedIp;
-        private readonly AllowedIp _allowedIp;
+        private readonly BlockIpBLL _blockIpBLL;
+        private readonly AllowIpBLL _allowIpBLL;
+        private BlockedIp _blockedIp;
+        private AllowedIp _allowedIp;
         private readonly IEnumerable<IPCountry> _ipCode;
 
-        public GeoIpService(ILogger<GeoIpService> logger, BlockedIp blockedIp, AllowedIp allowedIp, IIpCountryDataLayers ipCountry, IEnumerable<IPCountry> ipCode = null)
+        public GeoIpService(ILogger<GeoIpService> logger, BlockIpBLL blockIpBLL, AllowIpBLL allowIpBLL, IIpCountryDataLayers ipCountry, IEnumerable<IPCountry> ipCode = null)
         {
             _logger = logger;
             _ipCountry = ipCountry;
-            _allowedIp = allowedIp;
-            _blockedIp = blockedIp;
+            _blockIpBLL = blockIpBLL;
+            _allowIpBLL = allowIpBLL;
             _ipCode = ipCode;
         }
+
         public async Task<Country> Check(string ipAddress)
         {
             var country = new Country();
+            GetBlockIp();
+            GetAllowedIp();
             try
             {
                 var uip = IpConvert.GetIpToLong(ipAddress);
@@ -77,9 +82,11 @@ namespace GeoIP.Core
             return country;
         }
 
-        public void ApplyForbidden(ForbiddenCountries forbiddenCountries)
-        {
-            _forbiddenCountries = forbiddenCountries;
-        }
+        public void ApplyForbidden(ForbiddenCountries forbiddenCountries) => _forbiddenCountries = forbiddenCountries;
+
+        private void GetBlockIp() => _blockedIp = new BlockedIp(_blockIpBLL.GetBlockIpListWithCache());
+
+        private void GetAllowedIp() => _allowedIp = new AllowedIp(_allowIpBLL.GetAllowIpListWithCache());
+
     }
 }
