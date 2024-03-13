@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Http.Extensions;
+﻿using System.Text;
+
+using Microsoft.AspNetCore.Http.Extensions;
 
 namespace GeoIP.WebApi.Extension.Middlewares
 {
@@ -15,6 +17,7 @@ namespace GeoIP.WebApi.Extension.Middlewares
 
         public async Task Invoke(HttpContext context)
         {
+            context.Request.EnableBuffering();
             var url = context.Request.GetDisplayUrl();
             if (url.EndsWith("home.html"))
             {
@@ -27,15 +30,20 @@ namespace GeoIP.WebApi.Extension.Middlewares
 
                 await context.Request.Body.CopyToAsync(requestBodyStream);
                 requestBodyStream.Seek(0, SeekOrigin.Begin);
+               
+                using var requestBody = new StreamReader(requestBodyStream, Encoding.UTF8, true, 1024, true);
 
-                var requestBodyText = new StreamReader(requestBodyStream).ReadToEndAsync();
-                var headers = context.Request.Headers;
+                var codePage = requestBody.CurrentEncoding.CodePage;
+                var content = await requestBody.ReadToEndAsync();
 
-                _logger.LogInformation($"REQUEST METHOD: {context.Request.Method}, REQUEST BODY: {await requestBodyText}, REQUEST URL: {url}");
+                var log = new StringBuilder();
+                log.AppendLine($"REQUEST URL: {url}, Method: {context.Request.Method}, CodePage: {codePage},");
+                log.AppendLine($"REQUEST BODY: {content}");
+                _logger.LogInformation(log.ToString());
 
                 requestBodyStream.Seek(0, SeekOrigin.Begin);
                 context.Request.Body = requestBodyStream;
-                context.Items.Add("Body", requestBodyText);
+                context.Items.Add("Body", content);
 
                 await _next(context);
                 context.Request.Body = originalRequestBody;
