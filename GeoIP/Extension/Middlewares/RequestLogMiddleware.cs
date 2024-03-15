@@ -37,8 +37,7 @@ namespace GeoIP.WebApi.Extension.Middlewares
                 var content = await requestBody.ReadToEndAsync();
 
                 var log = new StringBuilder();
-                log.AppendLine($"REQUEST URL: {url}, Method: {context.Request.Method}, CodePage: {codePage},");
-                log.AppendLine($"REQUEST BODY: {content}");
+                log.AppendLine($"REQUEST URL: {url}, Method: {context.Request.Method}, CodePage: {codePage}, BODY: {content}");
                 _logger.LogInformation(log.ToString());
 
                 requestBodyStream.Seek(0, SeekOrigin.Begin);
