@@ -11,7 +11,7 @@
             RemoteIpAddress = ip;
             Code = string.Empty;
             Forbidden = true;
-            Message = $"IPAddress: [{ip}] {message}";
+            Message = $"[{ip}] {message}";
         }
     }
 }
