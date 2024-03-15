@@ -1,27 +1,22 @@
+using Elastic.Apm.StackExchange.Redis;
+
 using GeoIP.Core;
 using GeoIP.Core.BLL;
 using GeoIP.Core.DAL;
 using GeoIP.Core.Library;
 using GeoIP.Core.Models;
+
 using StackExchange.Redis;
-using Elastic.Apm.StackExchange.Redis;
 
 namespace GeoIP.WebApi.Extension
 {
     public static class ServiceCollectionExtension
     {
-
         public static IServiceCollection AddDatabaseConnection(this IServiceCollection services, IConfiguration config)
         {
-            var provider = services.BuildServiceProvider();
-            var logger = provider.GetRequiredService<ILogger<MySqlClient>>();
             var serviceType = Environment.GetEnvironmentVariable("ServiceType") ?? config.GetValue<string>("ServiceType");
-
-            services.AddSingleton<IMySqlClient>(param =>
-                    new MySqlClient(config.GetConnectionString($"{serviceType}_ReportDB"), logger, DataBase.Report))
-                .AddSingleton<IMySqlClient>(param =>
-                    new MySqlClient(config.GetConnectionString($"{serviceType}_ReportIPTable"), logger, DataBase.ReportIPTable));
-
+            services.AddSingleton(provider => new MySqlClient(provider, DataBase.Report, config.GetConnectionString($"{serviceType}_ReportDB")));
+            services.AddSingleton(provider => new MySqlClient(provider, DataBase.ReportIPTable, config.GetConnectionString($"{serviceType}_ReportIPTable")));
             return services;
         }
 
@@ -35,29 +30,15 @@ namespace GeoIP.WebApi.Extension
             return services;
         }
 
-        public static IServiceCollection RegisterServices(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection RegisterServices(this IServiceCollection services)
         {
-            services
-                .Configure<GeoIpSettings>(option =>
-                {
-                    configuration.GetSection("GeoIpSettings").Bind(option);
-                })
-                .AddSingleton<ILogger<GeoIpService>, Logger<GeoIpService>>()
-                .AddSingleton<GeoIpService>()
-                .AddSingleton<GeoIpSettings>()
-                .AddSingleton<ConfigService>()
-                .AddSingleton<AllowIpBLL>()
-                .AddSingleton<BlockIpBLL>()
-                .AddSingleton<IFile, FileLoader>()
-                .AddSingleton<IIpCountryDataLayers, IpCountryDataLayers>()
-                .AddSingleton<IMemberBlockIpDataLayers, MemberBlockIpDataLayers>()
-                .AddSingleton<IMemberAllowIpDataLayers, MemberAllowIpDataLayers>();
-
-            services.AddOptionListByIpTableDB<IPCountry>("Service_IPCode_Get");
+            services.AddSingleton<GeoIpService>();
+            services.AddSingleton<ConfigService>();
+            services.AddOptionList<IPCountry>("Service_IPCode_Get", dataBase: DataBase.ReportIPTable);
 
             //處理SiteConfig
-            services.AddOptionListByReportDB<ServerInfo>("ServerInfoList_Get");
-            services.AddOptionListByReportDB<ConfigObject>("SiteConfig_Get", new { ConfigGroup = "GeoIp" });
+            services.AddOptionList<ServerInfo>("ServerInfoList_Get", dataBase: DataBase.Report);
+            services.AddOptionList<ConfigObject>("SiteConfig_Get", new { ConfigGroup = "GeoIp" }, dataBase: DataBase.Report);
             services.AddSiteConfig();
             services.AddSingleton<ConfigBLL>();
             return services;
@@ -83,19 +64,12 @@ namespace GeoIP.WebApi.Extension
 
             return services;
         }
-        public static IServiceCollection AddOptionListByIpTableDB<T>(this IServiceCollection services, string sql, object parameters = null)
+
+        public static IServiceCollection AddOptionList<T>(this IServiceCollection services, string sql, object parameters = null, DataBase dataBase = DataBase.Report)
         {
             var provider = services.BuildServiceProvider();
             var configService = provider.GetRequiredService<ConfigService>();
-            var option = configService.Query<T>(sql, parameters);
-            services.AddSingleton(typeof(IEnumerable<T>), p => option);
-            return services;
-        }
-        public static IServiceCollection AddOptionListByReportDB<T>(this IServiceCollection services, string sql, object parameters = null)
-        {
-            var provider = services.BuildServiceProvider();
-            var configService = provider.GetRequiredService<ConfigService>();
-            var option = configService.QueryByReportDb<T>(sql, parameters);
+            var option = configService.Query<T>(sql, parameters, dataBase);
             services.AddSingleton(typeof(IEnumerable<T>), p => option);
             return services;
         }

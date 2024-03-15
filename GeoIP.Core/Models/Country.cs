@@ -5,12 +5,13 @@
         public string Code { get; set; }
         public bool Forbidden { get; set; }
         public string Message { get; set; }
-
-        public Country()
+        public string RemoteIpAddress { get; set; }
+        public Country(string ip, string message)
         {
+            RemoteIpAddress = ip;
             Code = string.Empty;
             Forbidden = true;
-            Message = "Succeed";
+            Message = $"IPAddress: [{ip}] {message}";
         }
     }
 }

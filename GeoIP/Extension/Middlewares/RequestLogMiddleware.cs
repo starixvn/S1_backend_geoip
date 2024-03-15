@@ -30,7 +30,7 @@ namespace GeoIP.WebApi.Extension.Middlewares
 
                 await context.Request.Body.CopyToAsync(requestBodyStream);
                 requestBodyStream.Seek(0, SeekOrigin.Begin);
-               
+
                 using var requestBody = new StreamReader(requestBodyStream, Encoding.UTF8, true, 1024, true);
 
                 var codePage = requestBody.CurrentEncoding.CodePage;
