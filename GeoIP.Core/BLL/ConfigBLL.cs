@@ -1,9 +1,12 @@
-﻿using GeoIP.Core.Models;
-using Microsoft.Extensions.DependencyInjection;
-using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+
+using GeoIP.Core.Models;
+
+using Microsoft.Extensions.DependencyInjection;
+
+using Newtonsoft.Json;
 
 namespace GeoIP.Core.BLL
 {
