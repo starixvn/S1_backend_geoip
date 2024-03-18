@@ -30,15 +30,14 @@ namespace GeoIP.WebApi.Extension.Middlewares
 
                 await context.Request.Body.CopyToAsync(requestBodyStream);
                 requestBodyStream.Seek(0, SeekOrigin.Begin);
-               
+
                 using var requestBody = new StreamReader(requestBodyStream, Encoding.UTF8, true, 1024, true);
 
                 var codePage = requestBody.CurrentEncoding.CodePage;
                 var content = await requestBody.ReadToEndAsync();
 
                 var log = new StringBuilder();
-                log.AppendLine($"REQUEST URL: {url}, Method: {context.Request.Method}, CodePage: {codePage},");
-                log.AppendLine($"REQUEST BODY: {content}");
+                log.AppendLine($"REQUEST URL: {url}, Method: {context.Request.Method}, CodePage: {codePage}, BODY: {content}");
                 _logger.LogInformation(log.ToString());
 
                 requestBodyStream.Seek(0, SeekOrigin.Begin);

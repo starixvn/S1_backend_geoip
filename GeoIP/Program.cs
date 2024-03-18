@@ -1,6 +1,8 @@
 using GeoIP.WebApi.Extension;
 using GeoIP.WebApi.Extension.Middlewares;
+
 using Prometheus;
+
 using Serilog;
 using Serilog.Exceptions;
 using Serilog.Formatting.Json;
@@ -49,7 +51,7 @@ void OverrideLoggerWriteToLFile(LoggerConfiguration configuration)
 builder.Services
     .AddDatabaseConnection(builder.Configuration)
     .AddRedisConnection(builder.Configuration)
-    .RegisterServices(builder.Configuration)
+    .RegisterServices()
     .AddControllers();
 
 var app = builder.Build();
@@ -70,5 +72,9 @@ app.UseEndpoints(endpoints =>
     });
     endpoints.MapControllers();
 });
+
+var minWorkers = Environment.ProcessorCount * 4;
+var minIOCPs = Environment.ProcessorCount * 4;
+ThreadPool.SetMinThreads(minWorkers, minIOCPs);
 
 app.Run();

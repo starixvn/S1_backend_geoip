@@ -18,16 +18,4 @@
       <ProjectReference Include="..\GeoIP.Core\GeoIP.Core.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <None Update="Data\IPInfo_WhiteList.csv">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="Data\IPInfo_WhiteList_with_EmptyValue.csv">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="Data\IPInfo_WhiteList_with_DuplicatedIPs.csv">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-    </ItemGroup>
-
 </Project>
